@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maxwell Lokshin — Builder, Climber, Cat Person</title>
+<meta name="description" content="Robotics, web apps and hackathon projects — plus climbing, cats and everything in between.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!--
+  ┌──────────────────────────────────────────────────────────────────────┐
+  │  HOW THIS FILE IS ORGANISED                                          │
+  │  1. <style>   – all styling (blueprint look, layout, modal, motion)  │
+  │  2. <body>    – empty containers; JavaScript fills them in           │
+  │  3. <script>  – the SITE object at the top is the ONLY thing you     │
+  │                 need to edit to change content (search "SITE = {")   │
+  │  Everything after the SITE object is engine code.                    │
+  └──────────────────────────────────────────────────────────────────────┘
+-->
+
+<style>
+/* ==========================================================================
+   1. TOKENS + RESET
+   ========================================================================== */
+:root{
+  --bp:#0d3b8f;
+  --bp-deep:#082662;
+  --grid-minor:rgba(255,255,255,.07);
+  --grid-major:rgba(255,255,255,.16);
+  --ink:#f3f7ff;
+  --dim:#b6c9f0;
+  --accent:#ffd23f;      /* climbing-tape yellow */
+  --cyan:#7fe0ff;
+  --paper:#f7f3e8;
+  --paper-ink:#0a1f4d;
+  --font-body:'Space Grotesk',system-ui,sans-serif;
+  --font-hand:'Caveat','Comic Sans MS',cursive;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --pad:clamp(20px,5vw,72px);
+  --max:1120px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;background:var(--bp);overflow-x:hidden}
+body{
+  position:relative;font-family:var(--font-body);color:var(--ink);line-height:1.6;
+  overflow-x:clip;-webkit-font-smoothing:antialiased;
+}
+img,video,canvas{max-width:100%;display:block}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
+::selection{background:var(--accent);color:var(--bp-deep)}
+
+/* ==========================================================================
+   2. BLUEPRINT BACKGROUND (fixed grid that drifts slightly as you scroll)
+   ========================================================================== */
+.bp{
+  position:fixed;inset:0;z-index:-3;pointer-events:none;
+  background:
+    linear-gradient(var(--grid-major) 1px,transparent 1px) 0 var(--py,0px)/120px 120px,
+    linear-gradient(90deg,var(--grid-major) 1px,transparent 1px) 0 0/120px 120px,
+    linear-gradient(var(--grid-minor) 1px,transparent 1px) 0 var(--py,0px)/24px 24px,
+    linear-gradient(90deg,var(--grid-minor) 1px,transparent 1px) 0 0/24px 24px,
+    var(--bp);
+}
+.bp::after{ /* vignette so the edges feel like the edge of a drawing sheet */
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(4,16,48,.55) 100%);
+}
+/* ==========================================================================
+   3. NAV
+   ========================================================================== */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px var(--pad);
+  background:linear-gradient(rgba(8,38,98,.85),rgba(8,38,98,0));
+  backdrop-filter:blur(6px);
+  font-family:var(--font-mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;
+}
+.nav .brand{font-family:var(--font-hand);font-size:1.7rem;text-transform:none;letter-spacing:0;text-decoration:none;color:var(--accent)}
+.nav ul{display:flex;gap:clamp(10px,2.4vw,30px);list-style:none}
+.nav a.link{text-decoration:none;color:var(--dim);position:relative;padding:4px 0;transition:color .2s}
+.nav a.link::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.nav a.link:hover,.nav a.link.active{color:#fff}
+.nav a.link.active::after,.nav a.link:hover::after{transform:scaleX(1)}
+
+/* ==========================================================================
+   4. LAYOUT PRIMITIVES
+   ========================================================================== */
+.sheet{position:relative;padding:130px var(--pad) 90px}
+.sheet.full{min-height:100vh}
+.wrap{max-width:var(--max);margin:0 auto;position:relative}
+.tag{
+  font-family:var(--font-mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--cyan);display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.tag::before{content:"";width:34px;height:1px;background:var(--cyan)}
+.title{font-size:clamp(2.2rem,6vw,4.4rem);line-height:1.02;font-weight:700;letter-spacing:-.02em}
+.title .hand{font-family:var(--font-hand);font-weight:700;color:var(--accent);font-size:1.1em;letter-spacing:0}
+.lede{color:var(--dim);max-width:60ch;font-size:1.08rem;margin-top:16px}
+
+.btn{
+  display:inline-flex;align-items:center;gap:10px;padding:12px 20px;
+  font-family:var(--font-mono);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;
+  border:1.5px solid rgba(255,255,255,.75);background:transparent;
+  box-shadow:4px 4px 0 rgba(255,255,255,.25);
+  transition:transform .15s,box-shadow .15s,background .2s,color .2s;
+}
+.btn:hover{transform:translate(3px,3px);box-shadow:1px 1px 0 rgba(255,255,255,.25);background:var(--accent);color:var(--bp-deep);border-color:var(--accent)}
+.btn.solid{background:var(--accent);color:var(--bp-deep);border-color:var(--accent);box-shadow:4px 4px 0 rgba(0,0,0,.3)}
+.btn.solid:hover{background:#fff;border-color:#fff}
+
+/* scroll-reveal (only hidden when JS is running, so no-JS still shows content) */
+.js .reveal{opacity:0;transform:translateY(34px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
+.js .reveal.in{opacity:1;transform:none}
+.js .reveal.left{transform:translateX(-50px)}
+.js .reveal.right{transform:translateX(50px)}
+.js .reveal.left.in,.js .reveal.right.in{transform:none}
+
+/* ==========================================================================
+   5. MEDIA SLOTS – any <img>/<video> holder. Empty ones show a drop target.
+   ========================================================================== */
+.slot{position:relative;overflow:hidden;aspect-ratio:var(--ar,4/3);background:rgba(255,255,255,.06)}
+.slot img,.slot video{width:100%;height:100%;object-fit:cover}
+.slot.empty{border:2px dashed rgba(255,255,255,.4);display:grid;place-items:center}
+.slot.empty::after{
+  content:attr(data-hint);font-family:var(--font-mono);font-size:.72rem;line-height:1.5;color:var(--dim);
+  text-align:center;padding:14px;white-space:pre-line;
+}
+.slot.dragover{outline:3px solid var(--accent);outline-offset:-3px;background:rgba(255,210,63,.18)}
+
+/* ==========================================================================
+   6. HERO / ABOUT
+   ========================================================================== */
+#about{padding-top:150px}
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,5vw,70px);align-items:center}
+.hero h1{font-size:clamp(3rem,9.5vw,8rem);line-height:.92;letter-spacing:-.04em;font-weight:700}
+.hero h1 .hand{display:block;font-family:var(--font-hand);color:var(--accent);font-size:.62em;letter-spacing:0;transform:rotate(-3deg);margin-bottom:6px}
+.hero .role{font-family:var(--font-mono);font-size:clamp(.95rem,1.8vw,1.2rem);margin-top:22px;color:var(--dim);min-height:1.7em}
+.hero .role b{color:var(--accent);font-weight:500;border-bottom:2px dashed var(--accent)}
+.hero .role .caret{display:inline-block;width:.6ch;background:var(--accent);margin-left:2px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.hero .cta{display:flex;flex-wrap:wrap;gap:16px;margin-top:34px}
+.hero-photo{position:relative;transform:rotate(3deg);background:var(--paper);padding:12px 12px 52px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.hero-photo .slot{--ar:4/5;background:#dde3f0}
+.hero-photo .slot.empty{border-color:rgba(10,31,77,.4)}
+.hero-photo .slot.empty::after{color:var(--paper-ink)}
+.hero-photo figcaption{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-family:var(--font-hand);font-size:1.6rem;color:var(--paper-ink)}
+.hero-photo::before{ /* strip of climbing tape */
+  content:"";position:absolute;top:-14px;left:50%;width:120px;height:30px;transform:translateX(-50%) rotate(-4deg);
+  background:repeating-linear-gradient(45deg,var(--accent) 0 10px,#e0b400 10px 20px);opacity:.92;
+}
+.story{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,70px);margin-top:clamp(70px,10vw,140px);align-items:start}
+.story h2{font-size:clamp(1.8rem,4vw,3rem);line-height:1.05;letter-spacing:-.02em}
+.story h2 .hand{font-family:var(--font-hand);color:var(--accent)}
+.story p{color:var(--dim);margin-bottom:1.1em;font-size:1.05rem}
+.story p b{color:#fff;font-weight:500}
+
+/* interest ticker */
+.ticker{margin:clamp(60px,9vw,110px) calc(var(--pad) * -1) 0;overflow:hidden;border-block:1px dashed rgba(255,255,255,.35);padding:14px 0;transform:rotate(-1.2deg);background:rgba(8,38,98,.55)}
+.ticker-track{display:flex;width:max-content;animation:scroll-x 32s linear infinite}
+.ticker span{font-family:var(--font-hand);font-size:2rem;white-space:nowrap;padding-right:2.2rem;color:#fff}
+.ticker span i{font-style:normal;color:var(--accent);margin-left:2.2rem}
+@keyframes scroll-x{to{transform:translateX(-50%)}}
+
+/* draggable polaroid board */
+.board{position:relative;height:calc(clamp(420px,58vw,560px) * (1 + (var(--rows,1) - 1) * .5));margin-top:50px}
+.board-hint{font-family:var(--font-hand);font-size:1.5rem;color:var(--accent);position:absolute;right:0;top:-40px;transform:rotate(3deg)}
+.polaroid{
+  position:absolute;--w:clamp(150px,24vw,250px);--h:calc(var(--w) + 47px);width:var(--w);background:var(--paper);color:var(--paper-ink);padding:9px 9px 38px;
+  box-shadow:0 14px 30px rgba(0,0,0,.4);transform:rotate(var(--r,0deg));cursor:grab;touch-action:none;user-select:none;
+  transition:box-shadow .2s,transform .2s;
+}
+.polaroid.drag{cursor:grabbing;box-shadow:0 30px 60px rgba(0,0,0,.5);transform:rotate(0deg) scale(1.06);z-index:20}
+.polaroid .slot{--ar:1/1;background:#dde3f0}
+.polaroid .slot.empty{border-color:rgba(10,31,77,.4)}
+.polaroid .slot.empty::after{color:var(--paper-ink)}
+.polaroid .slot img,.polaroid .slot video{pointer-events:none}
+.polaroid figcaption{position:absolute;left:0;right:0;bottom:6px;text-align:center;font-family:var(--font-hand);font-size:1.35rem}
+
+/* ==========================================================================
+   7. CAREER – a climbing route; every job is a "pitch"
+   ========================================================================== */
+.route{position:relative;margin-top:60px;padding:10px 0}
+.route::before{ /* the rope */
+  content:"";position:absolute;left:50%;top:0;bottom:0;width:0;border-left:3px dashed rgba(255,255,255,.5);transform:translateX(-50%);
+}
+.route-fill{position:absolute;left:50%;top:0;width:3px;height:var(--fill,0%);background:var(--accent);transform:translateX(-50%);box-shadow:0 0 14px var(--accent)}
+.pitch{position:relative;width:calc(50% - 46px);margin-bottom:clamp(50px,8vw,90px)}
+.pitch.left{margin-left:0}
+.pitch.right{margin-left:calc(50% + 46px)}
+.pitch::after{ /* the hold */
+  content:"";position:absolute;top:26px;width:20px;height:20px;border-radius:50% 45% 55% 40%;background:var(--accent);
+  border:3px solid var(--bp-deep);box-shadow:0 0 0 2px var(--accent);
+}
+.pitch.left::after{right:-56px}
+.pitch.right::after{left:-56px}
+.pitch-card{background:rgba(8,38,98,.72);border:1.5px solid rgba(255,255,255,.55);padding:22px 24px;backdrop-filter:blur(3px);box-shadow:6px 6px 0 rgba(255,255,255,.12)}
+.pitch-num{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+.pitch h3{font-size:1.45rem;line-height:1.15;margin:6px 0 2px}
+.pitch .org{font-family:var(--font-hand);font-size:1.5rem;color:var(--accent)}
+.pitch .when{font-family:var(--font-mono);font-size:.74rem;color:var(--dim);margin-bottom:10px}
+.pitch p{color:var(--dim);font-size:.98rem}
+.pitch ul{margin:10px 0 0 18px;color:var(--dim);font-size:.95rem}
+.pitch .slot{margin-top:16px}
+
+/* ==========================================================================
+   8. SKILLS – a gear rack
+   ========================================================================== */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:26px;margin-top:50px}
+.skill-group{border:1.5px solid rgba(255,255,255,.5);padding:22px;background:rgba(8,38,98,.6);position:relative}
+.skill-group h3{font-family:var(--font-mono);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+.skill-group h3::after{content:attr(data-count);float:right;color:var(--dim)}
+.skill{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;border-bottom:1px dashed rgba(255,255,255,.2);font-size:.98rem}
+.skill:last-child{border-bottom:0}
+.skill .grade{display:flex;gap:4px}
+.skill .grade i{width:12px;height:6px;background:rgba(255,255,255,.2);transform-origin:left;transform:scaleX(0);transition:transform .5s cubic-bezier(.2,.7,.2,1),background .3s;transition-delay:calc(var(--i) * .07s + var(--d,0s))}
+.skill-group.in .skill .grade i{transform:scaleX(1)}
+.skill-group.in .skill .grade i.on{background:var(--accent)}
+.skill:hover .grade i.on{background:#fff}
+
+/* ==========================================================================
+   9. PROJECTS GRID
+   ========================================================================== */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.chip{
+  font-family:var(--font-mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:7px 14px;border:1.5px solid rgba(255,255,255,.55);transition:background .2s,color .2s,transform .2s;
+}
+.chip:hover{transform:translateY(-2px);border-color:#fff}
+.chip.on{background:var(--accent);color:var(--bp-deep);border-color:var(--accent)}
+.projects{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:30px;margin-top:40px}
+.card{
+  position:relative;aspect-ratio:4/3;overflow:hidden;cursor:pointer;text-align:left;width:100%;
+  border:2px solid rgba(255,255,255,.7);background:var(--bp-deep);
+  transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,opacity .4s;
+  transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  box-shadow:6px 6px 0 rgba(255,255,255,.15);
+}
+.card:hover{box-shadow:10px 10px 0 var(--accent)}
+.card.hide{display:none}
+.card .slot{position:absolute;inset:0;aspect-ratio:auto;transition:transform .6s cubic-bezier(.2,.7,.2,1),filter .4s}
+.card:hover .slot{transform:scale(1.08);filter:brightness(.45) saturate(1.1)}
+.card-over{ /* the title that pops up on hover */
+  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:20px;
+  opacity:0;transform:translateY(20px);transition:opacity .3s,transform .4s cubic-bezier(.2,.7,.2,1);pointer-events:none;
+}
+.card:hover .card-over,.card:focus-visible .card-over{opacity:1;transform:none}
+.card-over .cat{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.card-over h3{font-size:1.6rem;line-height:1.1;margin:4px 0}
+.card-over p{font-size:.9rem;color:var(--dim)}
+.card-over .open{position:absolute;top:16px;right:16px;font-family:var(--font-hand);font-size:1.4rem;color:var(--accent);transform:rotate(4deg)}
+.card .corner{ /* blueprint registration marks */
+  position:absolute;width:14px;height:14px;border:2px solid var(--accent);opacity:0;transition:opacity .3s;z-index:2;pointer-events:none;
+}
+.card:hover .corner{opacity:1}
+.corner.tl{top:8px;left:8px;border-right:0;border-bottom:0}.corner.tr{top:8px;right:8px;border-left:0;border-bottom:0}
+.corner.bl{bottom:8px;left:8px;border-right:0;border-top:0}.corner.br{bottom:8px;right:8px;border-left:0;border-top:0}
+
+/* ==========================================================================
+   10. PROJECT MODAL
+   ========================================================================== */
+.modal{position:fixed;inset:0;z-index:100;display:none;background:rgba(3,12,36,.82);backdrop-filter:blur(6px)}
+.modal.open{display:block;animation:fade .3s}
+@keyframes fade{from{opacity:0}}
+.modal-scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding:clamp(12px,4vw,50px)}
+.modal-sheet{
+  max-width:940px;margin:0 auto;background:var(--bp);position:relative;
+  background-image:linear-gradient(var(--grid-minor) 1px,transparent 1px),linear-gradient(90deg,var(--grid-minor) 1px,transparent 1px);background-size:24px 24px;
+  border:2px solid #fff;box-shadow:12px 12px 0 rgba(0,0,0,.35);padding:clamp(22px,5vw,56px);
+  animation:rise .45s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes rise{from{opacity:0;transform:translateY(60px) scale(.97)}}
+.modal-close{position:sticky;top:0;float:right;z-index:5;width:44px;height:44px;border:2px solid #fff;background:var(--bp-deep);font-size:1.4rem;line-height:1;transition:background .2s,color .2s,transform .2s}
+.modal-close:hover{background:var(--accent);color:var(--bp-deep);transform:rotate(90deg)}
+.m-cat{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
+.m-title{font-size:clamp(2rem,5vw,3.6rem);line-height:1;letter-spacing:-.02em;margin:8px 0 12px}
+.m-tagline{font-family:var(--font-hand);font-size:1.7rem;color:var(--accent);line-height:1.2}
+.m-meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin:22px 0;padding:14px 0;border-block:1px dashed rgba(255,255,255,.4);font-family:var(--font-mono);font-size:.78rem;color:var(--dim)}
+.m-meta b{color:#fff;font-weight:500}
+.m-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.m-tags span{font-family:var(--font-mono);font-size:.7rem;padding:4px 10px;border:1px solid rgba(255,255,255,.5)}
+.m-block{margin:28px 0}
+.m-block .slot{aspect-ratio:auto;min-height:220px;border:2px solid #fff}
+.m-block .slot img,.m-block .slot video{height:auto;object-fit:contain;background:#000}
+.m-block figcaption{font-family:var(--font-mono);font-size:.74rem;color:var(--dim);margin-top:8px}
+.m-block h4{font-size:1.5rem;margin-bottom:8px}
+.m-block p{color:var(--dim);margin-bottom:1em}
+.m-block p b{color:#fff;font-weight:500}
+.m-block.pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.m-block.pair > .pair-cap{grid-column:1 / -1;margin-top:-6px}
+.m-links{display:flex;flex-wrap:wrap;gap:16px;margin-top:44px;padding-top:26px;border-top:2px solid #fff}
+
+/* ==========================================================================
+   11. FRAME-BY-FRAME SCROLL ANIMATION  (.scrub)
+   ========================================================================== */
+.scrub{position:relative;height:var(--h,300vh)}
+.scrub-stick{position:sticky;top:0;height:100vh;display:grid;place-items:center;overflow:hidden}
+/* width/height stay auto so the canvas keeps its own aspect ratio (works for 9:16 and 16:9) */
+.scrub canvas{width:auto;height:auto;max-width:min(100%,1100px);max-height:84vh;border:2px solid #fff;background:var(--bp-deep)}
+.scrub-cap{position:absolute;left:var(--pad);bottom:12vh;max-width:min(340px,80vw);font-family:var(--font-hand);font-size:clamp(1.6rem,3.5vw,2.6rem);line-height:1.1;color:var(--accent);opacity:0;transform:translateY(20px);transition:opacity .4s,transform .4s;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.scrub-cap.on{opacity:1;transform:none}
+.scrub-bar{position:absolute;left:0;bottom:0;height:4px;width:calc(var(--p,0) * 100%);background:var(--accent)}
+.m-block .scrub{--h:260vh}
+.m-block .scrub-stick{height:100vh}
+.scrub-inline{margin:0 calc(var(--pad) * -1)}
+
+/* ==========================================================================
+   12. CONTACT
+   ========================================================================== */
+#contact{min-height:100vh;display:grid;align-items:center}
+.contact-title{font-size:clamp(3rem,11vw,9rem);line-height:.9;letter-spacing:-.04em;font-weight:700}
+.contact-title .hand{font-family:var(--font-hand);color:var(--accent);font-size:.8em}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;margin-top:56px}
+.contact-card{
+  display:flex;flex-direction:column;gap:6px;padding:22px;text-align:left;text-decoration:none;
+  border:2px solid #fff;background:rgba(8,38,98,.7);box-shadow:6px 6px 0 rgba(255,255,255,.2);
+  transition:transform .2s,box-shadow .2s,background .2s,color .2s;position:relative;
+}
+.contact-card:hover{transform:translate(-4px,-4px) rotate(-1deg);box-shadow:10px 10px 0 var(--accent);background:var(--bp-deep)}
+.contact-card small{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan)}
+.contact-card strong{font-size:1.25rem;word-break:break-all}
+.contact-card em{font-family:var(--font-hand);font-style:normal;font-size:1.35rem;color:var(--accent)}
+.foot{margin-top:70px;font-family:var(--font-mono);font-size:.72rem;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* ==========================================================================
+   13. FUN EXTRAS: cat, climbing rail, cursor, title block, toast
+   ========================================================================== */
+.cat{position:fixed;right:clamp(10px,3vw,40px);bottom:-6px;width:96px;z-index:40;cursor:pointer;transition:transform .35s cubic-bezier(.3,1.6,.5,1);transform:translateY(30%)}
+.cat:hover{transform:translateY(0)}
+.cat.wiggle{animation:wiggle .5s}
+@keyframes wiggle{25%{transform:translateY(0) rotate(-6deg)}75%{transform:translateY(0) rotate(6deg)}}
+.cat svg{display:block;width:100%;height:auto;overflow:visible}
+.cat-bubble{position:absolute;right:70px;top:-38px;background:#fff;color:var(--paper-ink);font-family:var(--font-hand);font-size:1.4rem;padding:2px 12px;border-radius:14px;white-space:nowrap;opacity:0;transform:scale(.6);transform-origin:bottom right;transition:opacity .2s,transform .3s cubic-bezier(.3,1.6,.5,1);pointer-events:none}
+.cat-bubble.show{opacity:1;transform:none}
+
+.rail{position:fixed;left:clamp(8px,1.6vw,26px);top:14vh;bottom:14vh;width:2px;z-index:30;background:rgba(255,255,255,.28)}
+.rail-fill{position:absolute;left:0;bottom:0;width:100%;height:var(--p,0%);background:var(--accent)}
+.rail-climber{position:absolute;left:50%;bottom:var(--p,0%);width:14px;height:14px;border-radius:50%;background:var(--accent);transform:translate(-50%,50%);box-shadow:0 0 0 4px rgba(255,210,63,.3)}
+.rail-label{position:absolute;left:14px;bottom:var(--p,0%);transform:translateY(50%);font-family:var(--font-mono);font-size:.66rem;line-height:1.3;color:var(--accent);white-space:nowrap;background:rgba(8,38,98,.85);padding:3px 6px}
+.rail i{position:absolute;left:-4px;width:10px;height:2px;background:rgba(255,255,255,.5)}
+
+.titleblock{position:fixed;left:clamp(46px,4vw,70px);bottom:16px;z-index:30;border:1px solid rgba(255,255,255,.6);background:rgba(8,38,98,.85);font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;display:grid;grid-template-columns:auto auto;color:var(--dim)}
+.titleblock div{padding:4px 10px;border:1px solid rgba(255,255,255,.25)}
+.titleblock b{display:block;color:#fff;font-weight:500}
+
+.xhair{position:fixed;left:0;top:0;z-index:200;pointer-events:none;width:0;height:0;mix-blend-mode:difference;display:none}
+.xhair::before,.xhair::after{content:"";position:absolute;background:#fff}
+.xhair::before{left:-12px;top:0;width:24px;height:1px}
+.xhair::after{top:-12px;left:0;height:24px;width:1px}
+.xhair span{position:absolute;left:14px;top:10px;font-family:var(--font-mono);font-size:.62rem;color:#fff;white-space:nowrap}
+@media (hover:hover) and (pointer:fine){.xhair{display:block}}
+
+.toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,120px);z-index:300;background:var(--accent);color:var(--bp-deep);font-family:var(--font-mono);font-size:.8rem;padding:10px 18px;border:2px solid var(--bp-deep);box-shadow:5px 5px 0 rgba(0,0,0,.35);transition:transform .4s cubic-bezier(.3,1.5,.5,1)}
+.toast.show{transform:translate(-50%,0)}
+
+/* ==========================================================================
+   14. RESPONSIVE + REDUCED MOTION
+   ========================================================================== */
+@media (max-width:900px){
+  .hero,.story{grid-template-columns:1fr}
+  .hero-photo{max-width:340px;margin:20px auto 0}
+  .rail,.titleblock{display:none}
+  .scrub-cap{left:16px;right:16px;max-width:none;text-align:center;bottom:9vh}
+  .js .reveal.left,.js .reveal.right{transform:translateY(34px)}
+  .js .reveal.left.in,.js .reveal.right.in{transform:none}
+  .route::before,.route-fill{left:14px}
+  .pitch,.pitch.right,.pitch.left{width:auto;margin-left:44px}
+  .pitch.left::after,.pitch.right::after{left:-40px;right:auto}
+  .m-block.pair{grid-template-columns:1fr}
+  .nav ul{gap:12px}
+  .nav{font-size:.68rem}
+}
+@media (max-width:560px){.nav .brand{display:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<!-- blueprint grid background -->
+<div class="bp" id="bp" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#about" id="brand">ML</a>
+  <ul>
+    <li><a class="link" href="#about" data-nav="about">About</a></li>
+    <li><a class="link" href="#career" data-nav="career">Career</a></li>
+    <li><a class="link" href="#skills" data-nav="skills">Skills</a></li>
+    <li><a class="link" href="#projects" data-nav="projects">Projects</a></li>
+    <li><a class="link" href="#contact" data-nav="contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- climbing progress rail + blueprint title block -->
+<div class="rail" id="rail" aria-hidden="true">
+  <div class="rail-fill"></div><div class="rail-climber"></div><div class="rail-label" id="rail-label">V0 · 0 ft</div>
+</div>
+<div class="titleblock" id="titleblock" aria-hidden="true">
+  <div>Sheet<b id="tb-sheet">1 / 5</b></div><div>Section<b id="tb-name">About</b></div>
+  <div>Drawn by<b id="tb-by">—</b></div><div>Scale<b>1:1 (ish)</b></div>
+</div>
+
+<main>
+  <!-- ============ PAGE 1 · ABOUT ============ -->
+  <section class="sheet full" id="about">
+    <div class="wrap">
+      <div class="hero">
+        <div>
+          <div class="tag reveal" id="hero-tag"></div>
+          <h1 class="reveal" id="hero-name"></h1>
+          <p class="role reveal" id="hero-role"></p>
+          <div class="cta reveal" id="hero-cta"></div>
+        </div>
+        <figure class="hero-photo reveal right" id="hero-photo"></figure>
+      </div>
+
+      <div class="story">
+        <h2 class="reveal left" id="story-title"></h2>
+        <div class="reveal right" id="story-body"></div>
+      </div>
+
+      <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
+
+      <div class="board reveal" id="board"><div class="board-hint">drag me around →</div></div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 1b · CAREER (scroll down) ============ -->
+  <section class="sheet" id="career">
+    <div class="wrap">
+      <div class="tag reveal">Sheet 02 · The route so far</div>
+      <h2 class="title reveal" id="career-title"></h2>
+      <p class="lede reveal" id="career-lede"></p>
+      <div class="route" id="route"><div class="route-fill" id="route-fill"></div></div>
+    </div>
+  </section>
+
+  <!-- optional frame-by-frame scroll animation (see SITE.scrubs) -->
+  <div id="scrub-mount"></div>
+
+  <!-- ============ PAGE 1c · SKILLS (scroll down more) ============ -->
+  <section class="sheet" id="skills">
+    <div class="wrap">
+      <div class="tag reveal">Sheet 03 · The gear rack</div>
+      <h2 class="title reveal" id="skills-title"></h2>
+      <p class="lede reveal" id="skills-lede"></p>
+      <div class="skills-grid" id="skills-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 2 · PROJECTS ============ -->
+  <section class="sheet full" id="projects">
+    <div class="wrap">
+      <div class="tag reveal">Sheet 04 · Things I built</div>
+      <h2 class="title reveal" id="projects-title"></h2>
+      <p class="lede reveal" id="projects-lede"></p>
+      <div class="filters reveal" id="filters"></div>
+      <div class="projects" id="projects-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 3 · CONTACT ============ -->
+  <section class="sheet" id="contact">
+    <div class="wrap">
+      <div class="tag reveal">Sheet 05 · Say hi</div>
+      <h2 class="contact-title reveal" id="contact-title"></h2>
+      <p class="lede reveal" id="contact-lede"></p>
+      <div class="contact-grid" id="contact-grid"></div>
+      <div class="foot reveal"><span id="foot-l"></span><span id="foot-r"></span></div>
+    </div>
+  </section>
+</main>
+
+<!-- project modal -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="modal-scroll" id="modal-scroll">
+    <article class="modal-sheet" id="modal-sheet"></article>
+  </div>
+</div>
+
+<!-- decorations -->
+<div class="cat" id="cat" title="pet the cat">
+  <div class="cat-bubble" id="cat-bubble">mrrp!</div>
+  <svg viewBox="0 0 100 80" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 40 L12 8 L38 22 Q50 18 62 22 L88 8 L86 40 Q92 66 50 76 Q8 66 14 40Z" fill="#0a2a6b"/>
+    <path d="M18 14 L30 22 M82 14 L70 22" stroke="var(--accent)"/>
+    <g id="eyes">
+      <circle cx="35" cy="42" r="9" fill="#fff"/><circle cx="65" cy="42" r="9" fill="#fff"/>
+      <circle class="pupil" cx="35" cy="42" r="4.2" fill="#0a2a6b" stroke="none"/><circle class="pupil" cx="65" cy="42" r="4.2" fill="#0a2a6b" stroke="none"/>
+    </g>
+    <path d="M46 55 L54 55 L50 60Z" fill="var(--accent)" stroke="var(--accent)"/>
+    <path d="M50 60 Q44 68 38 64 M50 60 Q56 68 62 64"/>
+    <path d="M8 52 L26 55 M8 62 L26 60 M92 52 L74 55 M92 62 L74 60" stroke-width="1.6"/>
+  </svg>
+</div>
+<div class="xhair" id="xhair"><span id="xhair-t">0,0</span></div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+/* ==========================================================================
+   ★ SITE — THE ONLY PART YOU NEED TO EDIT ★
+   Everything below is EXAMPLE DATA. Replace text, then drop your files into
+   an /assets folder next to this file and point the "src" fields at them.
+
+   MEDIA CHEAT-SHEET
+   • An image or video is just a path:   { src:'assets/me.jpg' }  or  { src:'assets/clip.mp4' }
+     (.mp4/.webm/.mov → autoplaying muted loop; anything else → <img>)
+   • Leave src empty ('') and you get a dashed drop-zone. While previewing locally
+     you can DRAG any file from your desktop onto it to see how it will look.
+     (Drops are preview-only; the console prints the path to use for real.)
+   • Optional per-media fields:  ar:'16/9' (aspect ratio)  poster:'assets/x.jpg'  alt:'…'
+   ========================================================================== */
+const SITE = {
+  name: 'Maxwell Lokshin',
+  brand: 'ML',                                   // top-left logo text
+  roles: ['a robotics software engineer', 'a web app builder', 'a x1 hackathon winner', 'a hobbiest', 'a boulderer', 'a cat person', 'gardener'],
+
+  hero: {
+    tag: 'Sheet 01 · Hello, world',
+    greeting: 'HELLOOOO, I’m',
+    photo: { src: 'assets/pfp.jpeg', ar: '4/5', alt: 'Portrait of Maxwell' },
+    caption: 'this is me :)',
+  },
+
+  story: {
+    title: 'How I got <span class="hand">here</span>',
+    // Plain HTML strings. Use <b>…</b> for highlights.
+    paragraphs: [
+      'In middle school I always loved robots, starting with my first ever competitions with lego mindstorm',
+      'From there I didn’t have much of a plan up until college when things went into full gear.',
+      'Now I look at projects on LinkedIn and tell myself "I can build that"',
+      'Outside the projects and clubs: I climb <b>v3-4</b>, I have <b>3</b> family cats and <b>1</b> cat of my own, and nature is my true calling',
+    ],
+  },
+
+  ticker: ['bouldering', 'v4', 'robots', 'cats', 'hackathons', 'web apps', 'v3', 'CADing', 'gardening'],
+
+  // Draggable polaroids under the intro. Add as many as you like.
+  // Positions are randomised on every page load. To pin one, add  x: 10, y: 20, r: -5  (% across, % down, degrees).
+  life: [
+    { caption: 'climbing',   media: { src: 'assets/climb.jpeg' } },
+    { caption: 'red (og)',   media: { src: 'assets/red.jpeg' } },
+    { caption: 'onyx (he bites)',   media: { src: 'assets/onyx.jpeg' } },
+    { caption: 'cupid (the bear)',   media: { src: 'assets/cupid.jpeg' } },
+    { caption: 'totoro (goatoro)',   media: { src: 'assets/totoro.jpeg' } },
+    { caption: 'at home garden',   media: { src: 'assets/garden.jpeg' } },
+    { caption: 'glass blowing',   media: { src: 'assets/glass_blowing.jpeg' } },
+    { caption: 'Alicia <3 (my gf)',   media: { src: 'assets/alicia.jpeg' } },
+
+  ],
+
+  career: {
+    title: 'The route <span class="hand">so far</span>',
+    lede: 'Every job is a pitch. Scroll and the rope fills in as I climb to the top.',
+    items: [
+      { role: 'Intern/Software Engineer', org: 'PeakActivity', when: 'Jul 2025 – now',
+        blurb: 'I work as a consultant, creating software for clients per their request. I’ve learned so much from my fellow interns, peers, and seniors and can’t wait to see where my career goes.',
+        bullets: ['Internal systems', 'Client work'],
+        media: { src: 'assets/peakActivity.jpeg', ar: '16/9' } },
+
+      { role: 'Software member', org: 'IEEE @ UCF', when: 'Oct 2025 – now',
+        blurb: 'I started my robotics career here with SECBOT. Went to Alabama with my team to compete at regionals.',
+        bullets: ['Worked on: [perception, navigation(d*lite), controllers, etc...]', 'Won 8th in regionals', 'Gained new friendships'],
+        media: { src: 'assets/projects/ieee.jpg', ar: '16/9' } },
+      
+        { role: 'Project lead', org: 'AIRACERS [TEAM: Nice Green Machines] @ UCF', when: 'March 2026 – now',
+        blurb: 'This is where my interest in robotics starts to accel, pushing me further than I’ve ever gone. As a team we build a custom autonomous car from scratch using LIDAR as our eyes and a jettson nano as our brain. We competed locally to see who would get first place based on how good code is and design of the car.',
+        bullets: ['Worked on: [Docker environment, worked on jettson directly, custom pathing controller using pure pursuit]', 'Out of 5 minutes: [9 total laps, fastest lap of 24 seconds]', 'Custom car'],
+        media: { src: 'assets/projects/AIRACERS.jpg', ar: '16/9' } },
+    ],
+  },
+
+  // Frame-by-frame scroll animations. See the "SCRUB" section of the guide.
+  // Leave the array empty to hide. `after` = id of the section to insert it below.
+  scrubs: [
+    { after: 'career',
+      frames: 'assets/frames/climb/{n}.jpg',   // {n} becomes 0001, 0002, …
+      ar: '9/16',                                  // your video is portrait
+      count: 501, start: 1, pad: 4, height: '620vh',
+      captions: [
+        { at: 0.05, text: 'start low…' },
+        { at: 0.40, text: 'find the next hold' },
+        { at: 0.80, text: 'stick the top out' },
+      ] },
+  ],
+
+  skills: {
+    title: 'The <span class="hand">tools</span>',
+    lede: 'Bars are honest self-ratings: more yellow = more mileage.',
+    groups: [
+      { name: 'Robotics',  items: [['ROS 2', 4], ['C++', 4], ['Python', 5], ['CAD / Fusion360', 3], ['Embedded / Arduino', 3]] },
+      { name: 'Web',       items: [['JavaScript / TypeScript', 4], ['React', 4], ['Node.js', 4], ['HTML + CSS', 5], ['SQL/MongoDB', 4]] },
+      { name: 'Hacking',   items: [['Prototyping', 5], ['Computer vision', 5], ['ML + RL', 5], ['APIs + connections', 5], ['Pitching', 5]] },
+      { name: 'Off-screen', items: [['Bouldering', 3], ['Cat wrangling', 5]]},
+    ],
+  },
+
+  projects: {
+    title: 'Stuff I <span class="hand">built</span>',
+    lede: 'Hover a sheet to peek at it. Click to open the full drawing.',
+    // category must be one of: robotics | web | hackathon  (rename freely: filters are generated)
+    items: [
+      { id: 'car', category: 'robotics', title: 'Nice Green Machines (NGM)', year: '2026',
+        tagline: 'Autonomous racecar that navigates a track',
+        cover: { src: 'assets/projects/AIRACER2.JPG', ar: '4/3' },
+        role: 'Software', team: 'Team of 3', duration: '3 Weeks',
+        tags: ['ROS 2', 'LIDAR2D', 'Python', 'Makerworld', 'RVIZ'],
+        summary: 'This was one of the most fun projects I’ve done up to this point in my career since I could work along side both of my friends from highschool. I was able to really push forward my love for robotics through simulation in RVIZ while learning more of what it takes to make a robot move. I loved how hands on this project was and the team that I could work with.',
+        blocks: [
+          { type: 'text',  title: 'The problem', html: '<p>We needed to make a bunch of plastic <b>drive itself</b> in the shortest amount of time.</p>' },
+          { type: 'video', src: 'assets/projects/comprun.mp4', caption: 'The comp run!!!' },
+          { type: 'video', src: 'assets/projects/testrun.mp4', caption: 'Test run num. idk' },
+          { type: 'image', src: 'assets/projects/sim.png', caption: 'Sim' },
+          { type: 'text',  title: 'What I learned', html: '<p>Hardest part through all of this, was the limited time and our ambitiousness to make a perfect car within 3 weeks. But we found that if there’s a will there’s a way. Which is why we plan on coming back even stronger!!</p>' },
+        ],
+        github: 'https://github.com/Ai-racer-club/AI-Racer-2026', demo: '' },
+
+      { id: 'rover', category: 'robotics', title: 'SECBOT w/ IEEE', year: '2025-2026',
+        tagline: 'Autonomous rover that completes tasks and collects ducks.',
+        cover: { src: 'assets/projects/duck.jpeg' }, tags: ['Arduino', 'Python', 'Computer Vision', 'ros2', 'Sim'],
+        role: 'Software Member', team: 'Team of 4 - 8', duration: '5 Months',
+        summary: 'This is where the robotics interest sparked again. This project was so much fun and gave me the opportunity to build my own vision, nav, and control system all from scratch.', 
+        blocks: [
+          { type: 'image', src: 'assets/projects/nav.jpeg', caption: 'Nav in sim' },
+          { type: 'image', src: 'assets/projects/ieee4.jpeg', caption: 'Steeling duck from team lead' },
+          { type: 'pair', src: ['assets/projects/conference.jpg', 'assets/projects/ieee.jpg'], caption: 'Conference w/ everyone and TEAM!!!' },
+          { type: 'pair', src: ['assets/projects/ieee2.jpeg', 'assets/projects/ieee3.jpeg'], caption: 'The end' }
+        ],
+        github: 'https://github.com/maxwelllokshin1/ieee' },
+
+      { id: 'sports', category: 'web', title: 'SquadUp', year: '2026',
+        tagline: 'App used to make pickup game postings for UCF students',
+        cover: { src: 'assets/projects/squadup1.jpeg', ar: '4/3' },
+        role: 'Project Lead', team: 'Team of 6', duration: '1.5 Months',
+        tags: ['TypeScript', 'MongoDB', 'Remote Server', 'React'],
+        summary: 'This was one of the first times I used react in a project sense as well as leading a team like this. I was a great pleasure to work with every person in this group as completing a project like this didn’t feel like it was a class project, but rather something fun.',
+        blocks: [
+          { type: 'text',  title: 'The problem', html: '<p>We found ourselves struggling to find good pickup games at times that we wanted to go to the field.</p>' },
+          { type: 'text',  title: 'Solution', html: '<p>We developed this app so UCF students would make planning for pickup games easier rather than guessing if anyone was on the field at that time.</p>' },
+          { type: 'pair', src: ['assets/projects/squadup1.jpeg', 'assets/projects/squadup2.jpeg'], caption: '' },
+          { type: 'pair', src: ['assets/projects/squadup3.jpeg', 'assets/projects/squadup4.jpeg', 'assets/projects/squadup5.jpeg'], caption: '' },
+        ],
+        github: 'https://github.com/SquadUp-UCF', demo: '' },
+
+      { id: 'raytracing', category: 'web', title: 'TinyTracer', year: '2026',
+        tagline: 'Web App with a custom simulator and ray tracer [HACKATHON WINNER]',
+        cover: { src: 'assets/projects/hackathon4.jpeg', ar: '4/3' },
+        role: 'Software', team: 'Team of 3', duration: '12 hours',
+        summary: 'First ever hackathon and I learned so much. The whole idea of this project was to have users place a solar panel in the most optimal position to get the most sunlight/savings potential. This was such a fun project and creating a custom simulator in a web app was my part.',
+        blocks: [
+          { type: 'image', src: 'assets/projects/hackathon1.jpeg', caption: 'me!' },
+          { type: 'image', src: 'assets/projects/hackathon2.jpeg', caption: 'THE WIN!!!!' },
+          { type: 'pair', src: ['assets/projects/hackathon3.jpeg', 'assets/projects/hackathon5.jpeg'], caption: '' },
+        ],
+        github: 'https://github.com/cunkin375/tinytracer', demo: 'https://devpost.com/software/tiny-tracer' },
+    ],
+  },
+
+  contact: {
+    title: 'Let’s <span class="hand">talk.</span>',
+    lede: 'Robots, code, climbing, cat photos - all are welcome.',
+    email: 'maxwell.lokshin@2zick.com',                     // ← copy-to-clipboard button
+    github: 'https://github.com/maxwelllokshin1',
+    linkedin: 'https://www.linkedin.com/in/maxwelllokshin',
+    resume: 'assets/resume.pdf',                  // drop your PDF here
+    footLeft: '© ' + new Date().getFullYear() + ' Maxwell Lokshin',
+    footRight: 'hand-drafted on a blueprint',
+  },
+};
+
+/* ==========================================================================
+   ENGINE (you shouldn't need to touch anything below)
+   ========================================================================== */
+document.documentElement.classList.add('js');
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const rand  = (a, b) => a + Math.random() * (b - a);
+const shuffle = arr => { for (let i = arr.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
+const VIDEO_RE = /\.(mp4|webm|mov|m4v|ogv)(\?.*)?$/i;
+function h(tag, cls, html) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (html != null) n.innerHTML = html;
+  return n;
+}
+
+/* ---------- media slots: <img>/<video>/drop-zone ---------- */
+// Plays videos only while on screen (saves battery, keeps the page smooth).
+const videoObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    const v = e.target;
+    if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
+  });
+}, { threshold: 0.25 });
+
+function fillSlot(slotEl, src, { isVideo, poster, alt = '', controls = false } = {}) {
+  slotEl.innerHTML = '';
+  slotEl.classList.remove('empty');
+  isVideo = isVideo ?? VIDEO_RE.test(src);
+  let node;
+  if (isVideo) {
+    node = h('video');
+    node.src = src; node.muted = true; node.loop = true; node.playsInline = true;
+    node.autoplay = true; node.preload = 'metadata'; node.controls = controls;
+    if (poster) node.poster = poster;
+    videoObserver.observe(node);
+  } else {
+    node = h('img');
+    node.src = src; node.alt = alt; node.loading = 'lazy'; node.decoding = 'async';
+  }
+  node.draggable = false;
+  slotEl.append(node);
+}
+
+function slot(media = {}, opts = {}) {
+  if (typeof media === 'string') media = { src: media };
+  const s = h('div', 'slot');
+  if (media.ar) s.style.setProperty('--ar', media.ar);
+  s.dataset.hint = media.hint || 'drop an image or video here\n(preview only — set src in SITE)';
+  if (media.src) fillSlot(s, media.src, { poster: media.poster, alt: media.alt, ...opts });
+  else s.classList.add('empty');
+
+  // Drag a file from your desktop onto any slot to preview it (nothing is uploaded or saved)
+  ['dragenter', 'dragover'].forEach(t => s.addEventListener(t, e => { e.preventDefault(); s.classList.add('dragover'); }));
+  ['dragleave', 'dragend'].forEach(t => s.addEventListener(t, () => s.classList.remove('dragover')));
+  s.addEventListener('drop', e => {
+    e.preventDefault(); e.stopPropagation();
+    s.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (!f) return;
+    const isVideo = f.type.startsWith('video/'), isImg = f.type.startsWith('image/');
+    if (!isVideo && !isImg) return toast('That’s not an image or video 🙃');
+    fillSlot(s, URL.createObjectURL(f), { isVideo, ...opts });
+    console.log(`%cPreview only. To keep it: put "${f.name}" in /assets and use src:'assets/${f.name}'`, 'color:#ffd23f');
+    toast(`Previewing ${f.name} — see console for how to keep it`);
+  });
+  return s;
+}
+// Stop the browser from navigating away if a file is dropped outside a slot
+['dragover', 'drop'].forEach(t => window.addEventListener(t, e => e.preventDefault()));
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ---------- scroll-reveal ---------- */
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
+}, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+function observeReveals(root = document) {
+  $$('.reveal:not(.in)', root).forEach(n => revealObserver.observe(n));
+}
+// used inside the modal, which scrolls on its own
+function observeRevealsIn(scroller, root) {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  }), { root: scroller, threshold: 0.1 });
+  $$('.reveal', root).forEach(n => io.observe(n));
+}
+
+/* ---------- copy email ---------- */
+async function copyEmail() {
+  const email = SITE.contact.email;
+  try { await navigator.clipboard.writeText(email); }
+  catch { // fallback for older browsers / non-https
+    const ta = h('textarea'); ta.value = email; document.body.append(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  toast('Email copied → ' + email);
+}
+
+/* ==========================================================================
+   RENDER: ABOUT · CAREER · SKILLS · CONTACT
+   ========================================================================== */
+function renderAbout() {
+  const { name, hero, story, ticker, life, contact } = SITE;
+  $('#brand').textContent = SITE.brand;
+  $('#hero-tag').textContent = hero.tag;
+
+  const [first, ...rest] = name.split(' ');
+  $('#hero-name').innerHTML = `<span class="hand">${hero.greeting}</span>${first}${rest.length ? '<br>' + rest.join(' ') : ''}`;
+
+  $('#hero-cta').innerHTML = `
+    <a class="btn solid" href="${contact.resume}" download>↓ Résumé</a>
+    <a class="btn" href="#projects">See projects</a>
+    <button class="btn" data-copy-email>⧉ Copy email</button>`;
+
+  const photo = $('#hero-photo');
+  photo.append(slot(hero.photo), h('figcaption', '', hero.caption));
+
+  $('#story-title').innerHTML = story.title;
+  $('#story-body').innerHTML = story.paragraphs.map(p => `<p>${p}</p>`).join('');
+
+  const items = ticker.map(t => `<span>${t}<i>✦</i></span>`).join('');
+  $('#ticker').innerHTML = items + items; // doubled so the -50% loop is seamless
+
+  renderLife($('#board'), life);
+}
+
+// Scatter the polaroids on a jittered grid: cells are shuffled and every card gets a random
+// offset inside its cell, so they spread out, overlap a little, and differ on every visit.
+// A card can still be pinned with x / y (percent) and r (degrees) in SITE.life.
+function renderLife(board, life) {
+  const cols = Math.min(life.length, innerWidth < 700 ? 2 : 4);
+  const rows = Math.ceil(life.length / cols);
+  board.style.setProperty('--rows', rows);
+  const cells = shuffle([...Array(cols * rows).keys()]);
+  life.forEach((item, i) => {
+    const c = cells[i] % cols, r = Math.floor(cells[i] / cols);
+    const x = item.x ?? (c + rand(0, 0.7)) / cols * 100;
+    const y = item.y ?? (r + rand(0, 0.8)) / rows * 100;
+    const p = h('figure', 'polaroid');
+    // min(...) keeps every card fully inside the board, whatever the screen size
+    p.style.left = `min(${x}%, calc(100% - var(--w)))`;
+    p.style.top  = `min(${y}%, calc(100% - var(--h)))`;
+    p.style.setProperty('--r', (item.r ?? rand(-9, 9)).toFixed(1) + 'deg');
+    p.append(slot(item.media), h('figcaption', '', item.caption));
+    board.append(p);
+  });
+}
+
+// Typewriter that cycles through SITE.roles
+function startTypewriter() {
+  const out = $('#hero-role'), roles = SITE.roles;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { out.innerHTML = `I’m <b>${roles[0]}</b>`; return; }
+  let i = 0, c = 0, dir = 1;
+  (function tick() {
+    const word = roles[i];
+    c += dir;
+    out.innerHTML = `I’m <b>${word.slice(0, c)}</b><span class="caret">&nbsp;</span>`;
+    let delay = dir > 0 ? 85 : 40;
+    if (dir > 0 && c === word.length) { dir = -1; delay = 1400; }
+    else if (dir < 0 && c === 0) { dir = 1; i = (i + 1) % roles.length; delay = 350; }
+    setTimeout(tick, delay);
+  })();
+}
+
+function renderCareer() {
+  const { career } = SITE;
+  $('#career-title').innerHTML = career.title;
+  $('#career-lede').textContent = career.lede;
+  const route = $('#route');
+  career.items.forEach((it, n) => {
+    const p = h('div', 'pitch reveal ' + (n % 2 ? 'right' : 'left'));
+    p.innerHTML = `
+      <div class="pitch-card">
+        <div class="pitch-num">Pitch ${String(n + 1).padStart(2, '0')}</div>
+        <h3>${it.role}</h3>
+        <div class="org">${it.org}</div>
+        <div class="when">${it.when}</div>
+        ${it.blurb ? `<p>${it.blurb}</p>` : ''}
+        ${it.bullets?.length ? `<ul>${it.bullets.map(b => `<li>${b}</li>`).join('')}</ul>` : ''}
+      </div>`;
+    if (it.media) p.querySelector('.pitch-card').append(slot(it.media));
+    route.append(p);
+  });
+}
+
+function renderSkills() {
+  const { skills } = SITE;
+  $('#skills-title').innerHTML = skills.title;
+  $('#skills-lede').textContent = skills.lede;
+  const grid = $('#skills-grid');
+  skills.groups.forEach((g, gi) => {
+    const box = h('div', 'skill-group reveal');
+    box.style.setProperty('--d', gi * 0.1 + 's');
+    box.innerHTML = `<h3 data-count="${String(g.items.length).padStart(2, '0')}">${g.name}</h3>` + g.items.map(([label, lvl]) => `
+      <div class="skill"><span>${label}</span>
+        <span class="grade" title="${lvl}/5">${[1, 2, 3, 4, 5].map(i => `<i style="--i:${i}" class="${i <= lvl ? 'on' : ''}"></i>`).join('')}</span>
+      </div>`).join('');
+    grid.append(box);
+  });
+}
+
+function renderContact() {
+  const c = SITE.contact;
+  $('#contact-title').innerHTML = c.title;
+  $('#contact-lede').textContent = c.lede;
+  const grid = $('#contact-grid');
+  grid.innerHTML = `
+    <button class="contact-card reveal" data-copy-email><small>Email</small><strong>${c.email}</strong><em>click to copy ✎</em></button>
+    <a class="contact-card reveal" style="--d:.08s" href="${c.github}" target="_blank" rel="noopener"><small>GitHub</small><strong>${c.github.replace(/^https?:\/\/(www\.)?/, '')}</strong><em>see the code ↗</em></a>
+    <a class="contact-card reveal" style="--d:.16s" href="${c.linkedin}" target="_blank" rel="noopener"><small>LinkedIn</small><strong>${c.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</strong><em>let’s connect ↗</em></a>
+    <a class="contact-card reveal" style="--d:.24s" href="${c.resume}" download><small>Résumé</small><strong>resume.pdf</strong><em>download ↓</em></a>`;
+  $('#foot-l').textContent = c.footLeft;
+  $('#foot-r').textContent = c.footRight;
+  $('#tb-by').textContent = SITE.name.split(' ')[0];
+}
+
+// any element with data-copy-email copies the address
+document.addEventListener('click', e => { if (e.target.closest('[data-copy-email]')) copyEmail(); });
+
+/* ==========================================================================
+   RENDER: PROJECTS + MODAL
+   ========================================================================== */
+const PROJECTS = () => SITE.projects.items;
+const nice = s => s.charAt(0).toUpperCase() + s.slice(1);
+let lastFocus = null;
+
+function renderProjects() {
+  const { projects } = SITE;
+  $('#projects-title').innerHTML = projects.title;
+  $('#projects-lede').textContent = projects.lede;
+
+  // filter chips are generated from whatever categories you use
+  const cats = ['all', ...new Set(projects.items.map(p => p.category))];
+  const filters = $('#filters');
+  cats.forEach((c, i) => {
+    const b = h('button', 'chip' + (i ? '' : ' on'), nice(c));
+    b.dataset.cat = c;
+    filters.append(b);
+  });
+  filters.addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    $$('.chip', filters).forEach(x => x.classList.toggle('on', x === b));
+    $$('.card').forEach(card => card.classList.toggle('hide', b.dataset.cat !== 'all' && card.dataset.cat !== b.dataset.cat));
+    requestFrame();
+  });
+
+  const grid = $('#projects-grid');
+  projects.items.forEach((p, i) => {
+    const card = h('button', 'card reveal');
+    card.dataset.id = p.id; card.dataset.cat = p.category;
+    card.style.setProperty('--d', (i % 3) * 0.08 + 's');
+    card.setAttribute('aria-label', `Open project: ${p.title}`);
+    card.append(slot({ ...p.cover, ar: 'auto' }));
+    card.insertAdjacentHTML('beforeend', `
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="card-over">
+        <span class="open">open ↗</span>
+        <span class="cat">${p.category} · ${p.year || ''}</span>
+        <h3>${p.title}</h3>
+        <p>${p.tagline || ''}</p>
+      </div>`);
+    grid.append(card);
+  });
+
+  grid.addEventListener('click', e => {
+    const card = e.target.closest('.card');
+    if (card && !e.target.closest('.slot.dragover')) openProject(card.dataset.id);
+  });
+
+  // subtle 3D tilt that follows the pointer
+  grid.addEventListener('pointermove', e => {
+    const card = e.target.closest('.card'); if (!card || e.pointerType === 'touch') return;
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--ry', ((e.clientX - r.left) / r.width - 0.5) * 9 + 'deg');
+    card.style.setProperty('--rx', ((e.clientY - r.top) / r.height - 0.5) * -9 + 'deg');
+  });
+  grid.addEventListener('pointerout', e => {
+    const card = e.target.closest('.card'); if (!card) return;
+    card.style.setProperty('--rx', '0deg'); card.style.setProperty('--ry', '0deg');
+  });
+}
+
+function renderBlock(b) {
+  const f = h('figure', 'm-block reveal');
+  switch (b.type) {
+    case 'text':
+      f.innerHTML = (b.title ? `<h4>${b.title}</h4>` : '') + (b.html || '');
+      break;
+    case 'pair': {
+      // two side by side. Either  src: ['a.jpg', 'b.jpg'], caption: 'shared caption'
+      // or the long form         items: [{ src:'a.jpg', caption:'left' }, { src:'b.jpg', caption:'right' }]
+      f.classList.add('pair');
+      const list = (b.items || b.src || []).map(it => typeof it === 'string' ? { src: it } : it);
+      list.forEach(it => {
+        const w = h('div'); w.append(slot(it, { controls: true }));
+        if (it.caption) w.append(h('figcaption', '', it.caption));
+        f.append(w);
+      });
+      if (b.caption) f.append(h('figcaption', 'pair-cap', b.caption));   // spans both columns
+      break;
+    }
+    case 'scrub':
+      return makeScrub(b, 'modal');
+    default: // image | video
+      f.append(slot(b, { controls: true }));
+      if (b.caption) f.append(h('figcaption', '', b.caption));
+  }
+  return f;
+}
+
+function openProject(id) {
+  const p = PROJECTS().find(x => x.id === id); if (!p) return;
+  lastFocus = document.activeElement;
+  const sheet = $('#modal-sheet');
+  sheet.innerHTML = `
+    <button class="modal-close" aria-label="Close project">✕</button>
+    <div class="m-cat">${p.category} · ${p.year || ''}</div>
+    <h2 class="m-title" id="m-title">${p.title}</h2>
+    <p class="m-tagline">${p.tagline || ''}</p>
+    <div class="m-meta">
+      ${p.role ? `<span>Role: <b>${p.role}</b></span>` : ''}
+      ${p.team ? `<span>Team: <b>${p.team}</b></span>` : ''}
+      ${p.duration ? `<span>Time: <b>${p.duration}</b></span>` : ''}
+    </div>
+    <div class="m-tags">${(p.tags || []).map(t => `<span>${t}</span>`).join('')}</div>`;
+
+  // cover first, then summary, then all the blocks you defined
+  const cover = h('figure', 'm-block reveal'); cover.append(slot({ ...p.cover, ar: null }, { controls: true }));
+  sheet.append(cover);
+  if (p.summary) sheet.append(h('div', 'm-block reveal', `<p>${p.summary}</p>`));
+  (p.blocks || []).forEach(b => sheet.append(renderBlock(b)));
+
+  // links live at the very bottom
+  const links = h('div', 'm-links');
+  if (p.github) links.insertAdjacentHTML('beforeend', `<a class="btn solid" href="${p.github}" target="_blank" rel="noopener">★ View on GitHub ↗</a>`);
+  if (p.demo)   links.insertAdjacentHTML('beforeend', `<a class="btn" href="${p.demo}" target="_blank" rel="noopener">Live demo ↗</a>`);
+  sheet.append(links);
+
+  const modal = $('#modal'), scroller = $('#modal-scroll');
+  modal.classList.add('open');
+  scroller.scrollTop = 0;
+  document.documentElement.style.overflow = 'hidden';
+  observeRevealsIn(scroller, sheet);
+  $('.modal-close', sheet).focus({ preventScroll: true });
+  history.replaceState(null, '', '#project-' + id);
+  requestFrame();
+}
+
+function closeProject() {
+  const modal = $('#modal'); if (!modal.classList.contains('open')) return;
+  modal.classList.remove('open');
+  $('#modal-sheet').innerHTML = '';
+  scrubs.splice(0, scrubs.length, ...scrubs.filter(s => s.owner !== 'modal')); // drop modal-only scrubs
+  document.documentElement.style.overflow = '';
+  history.replaceState(null, '', '#projects');
+  lastFocus?.focus?.({ preventScroll: true });
+}
+$('#modal').addEventListener('click', e => {
+  if (e.target.closest('.modal-close') || e.target.id === 'modal-scroll') closeProject();
+});
+addEventListener('keydown', e => { if (e.key === 'Escape') closeProject(); });
+
+/* ==========================================================================
+   SCRUB: frame-by-frame animation driven by scroll position
+   A tall section holds a sticky <canvas>. How far you've scrolled through the
+   section (0→1) picks which numbered image to draw. See the guide for the
+   ffmpeg command that turns a video into those numbered images.
+   ========================================================================== */
+const scrubs = [];
+function makeScrub(cfg, owner = 'page') {
+  const { frames, count = 60, start = 1, pad = 4, height = '300vh', captions = [], ar = '16/9' } = cfg;
+  const wrap = h('div', 'scrub');
+  wrap.style.setProperty('--h', height);
+  wrap.innerHTML = `<div class="scrub-stick"><canvas></canvas><div class="scrub-cap"></div><div class="scrub-bar"></div></div>`;
+  const canvas = $('canvas', wrap), ctx = canvas.getContext('2d'), cap = $('.scrub-cap', wrap);
+  const [aw, ah] = ar.split('/').map(Number);              // e.g. '9/16' for a phone video filmed upright
+  canvas.width = 1280; canvas.height = Math.round(1280 * ah / aw);
+
+  const imgs = new Array(count).fill(null);
+  let loading = false, missing = false, current = -1;
+  const url = i => frames.replace('{n}', String(start + i).padStart(pad, '0'));
+
+  function placeholder(i, p) {
+    ctx.fillStyle = '#082662'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
+    for (let y = 0; y < canvas.height; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+    const cx = canvas.width / 2, cy = canvas.height / 2;
+    ctx.fillStyle = '#ffd23f'; ctx.font = '700 120px "Caveat", cursive'; ctx.textAlign = 'center';
+    ctx.fillText('frame ' + String(start + i).padStart(pad, '0') + ' / ' + (start + count - 1), cx, cy);
+    ctx.fillStyle = '#b6c9f0'; ctx.font = '22px "IBM Plex Mono", monospace';
+    ctx.fillText('no frames found at ' + frames, cx, cy + 70);
+    ctx.fillText('(see the guide: ffmpeg -i clip.mp4 …)', cx, cy + 106);
+    // little climber that rides the progress
+    ctx.fillStyle = '#ffd23f'; ctx.beginPath(); ctx.arc(120 + p * (canvas.width - 240), canvas.height - 100 - p * 40, 14, 0, 7); ctx.fill();
+  }
+
+  function draw(i, p) {
+    if (missing) return placeholder(i, p);
+    // nearest already-loaded frame (either side), so scrubbing never flashes blank while the rest loads
+    let im = null;
+    for (let d = 0; d < count && !im; d++) im = imgs[i - d] || imgs[i + d] || null;
+    if (!im || !im.naturalWidth) return;
+    if (canvas.width !== im.naturalWidth || canvas.height !== im.naturalHeight) { canvas.width = im.naturalWidth; canvas.height = im.naturalHeight; }
+    ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
+  }
+
+  function load() {
+    if (loading) return; loading = true;
+    // load order: every 20th frame, then every 5th, then the rest -> a rough version of the whole
+    // animation is available quickly, and it sharpens as the remaining frames arrive
+    const order = [], seen = new Set();
+    [20, 5, 1].forEach(step => { for (let i = 0; i < count; i += step) if (!seen.has(i)) { seen.add(i); order.push(i); } });
+    let next = 0, active = 0;
+    const pump = () => {
+      while (!missing && active < 6 && next < count) {
+        const i = order[next++], im = new Image(); active++;
+        im.onload = () => { imgs[i] = im; active--; if (i === 0 || i === current) current = -1; pump(); };
+        im.onerror = () => { active--; if (i === 0) { missing = true; current = -1; } pump(); };
+        im.src = url(i);
+      }
+    };
+    pump();
+  }
+
+  const api = {
+    el: wrap, owner,
+    update(vh) {
+      const r = wrap.getBoundingClientRect();
+      if (r.top > vh * 2 || r.bottom < -vh) return;          // far away: do nothing
+      load();                                                 // lazy: start fetching frames when near
+      const p = clamp(-r.top / Math.max(1, r.height - vh));
+      const i = Math.round(p * (count - 1));
+      wrap.style.setProperty('--p', p);
+      if (i !== current) { current = i; draw(i, p); }
+      // captions: show the latest one whose "at" has passed
+      const c = [...captions].reverse().find(c => p >= c.at);
+      cap.classList.toggle('on', !!c && p < 0.97);
+      if (c && cap.textContent !== c.text) cap.textContent = c.text;
+    },
+  };
+  scrubs.push(api);
+  requestAnimationFrame(() => api.update(innerHeight));
+  return wrap;
+}
+
+function renderScrubs() {
+  (SITE.scrubs || []).forEach(cfg => {
+    const target = document.getElementById(cfg.after || 'career');
+    if (target) target.after(makeScrub(cfg, 'page'));
+  });
+}
+
+/* ==========================================================================
+   MAIN SCROLL LOOP – one rAF-throttled function drives every scroll effect
+   ========================================================================== */
+const SECTIONS = [['about', 'About'], ['career', 'Career'], ['skills', 'Skills'], ['projects', 'Projects'], ['contact', 'Contact']];
+let ticking = false;
+function requestFrame() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
+
+function frame() {
+  ticking = false;
+  const y = scrollY, vh = innerHeight;
+  const max = Math.max(1, document.documentElement.scrollHeight - vh);
+  const p = clamp(y / max);
+
+  // blueprint grid drifts slower than the page (parallax)
+  $('#bp').style.setProperty('--py', (-y * 0.3) + 'px');
+
+  // climbing rail: grade + "elevation" go up as you scroll
+  const rail = $('#rail');
+  rail.style.setProperty('--p', (p * 100).toFixed(1) + '%');
+  $('#rail-label').textContent = p > 0.985 ? 'SUMMIT ⛰' : `V${Math.min(10, Math.floor(p * 11))} · ${Math.round(p * 14000).toLocaleString()} ft`;
+
+  // which sheet are we on? (drives nav underline + title block)
+  let idx = 0;
+  SECTIONS.forEach(([id], i) => { if (document.getElementById(id).getBoundingClientRect().top <= vh * 0.4) idx = i; });
+  $$('[data-nav]').forEach(a => a.classList.toggle('active', a.dataset.nav === SECTIONS[idx][0]));
+  $('#tb-sheet').textContent = `${idx + 1} / ${SECTIONS.length}`;
+  $('#tb-name').textContent = SECTIONS[idx][1];
+
+  // career rope fills as it scrolls past the middle of the screen
+  const route = $('#route').getBoundingClientRect();
+  $('#route').style.setProperty('--fill', (clamp((vh * 0.55 - route.top) / route.height) * 100).toFixed(1) + '%');
+
+  scrubs.forEach(s => s.update(vh));
+
+}
+addEventListener('scroll', requestFrame, { passive: true });
+addEventListener('resize', requestFrame);
+$('#modal-scroll').addEventListener('scroll', requestFrame, { passive: true });
+
+/* ==========================================================================
+   FUN EXTRAS
+   ========================================================================== */
+function initExtras() {
+  // ----- crosshair cursor with live "blueprint coordinates"
+  const xh = $('#xhair'), xt = $('#xhair-t');
+  addEventListener('pointermove', e => {
+    xh.style.transform = `translate(${e.clientX}px,${e.clientY}px)`;
+    xt.textContent = `X ${String(Math.round(e.clientX)).padStart(4, '0')}  Y ${String(Math.round(e.clientY + scrollY)).padStart(5, '0')}`;
+  }, { passive: true });
+
+  // ----- cat: eyes follow the pointer, click for a reaction
+  const cat = $('#cat'), pupils = $$('.pupil', cat), bubble = $('#cat-bubble');
+  addEventListener('pointermove', e => {
+    const r = cat.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height * 0.5);
+    const d = Math.hypot(dx, dy) || 1, m = Math.min(4, d / 60);
+    pupils.forEach(p => p.setAttribute('transform', `translate(${(dx / d * m).toFixed(2)} ${(dy / d * m).toFixed(2)})`));
+  }, { passive: true });
+  const meows = ['mrrp!', 'meow', 'prrrr…', 'feed me', '*blep*', 'nap time?', 'send it', 'pspsps'];
+  let bt;
+  cat.addEventListener('click', () => {
+    bubble.textContent = meows[(Math.random() * meows.length) | 0];
+    bubble.classList.add('show'); cat.classList.remove('wiggle'); void cat.offsetWidth; cat.classList.add('wiggle');
+    clearTimeout(bt); bt = setTimeout(() => bubble.classList.remove('show'), 1500);
+  });
+
+  // ----- draggable polaroids
+  let z = 10;
+  $$('.polaroid').forEach(p => {
+    let sx, sy, ox, oy;
+    p.addEventListener('pointerdown', e => {
+      if (e.button) return;
+      p.setPointerCapture(e.pointerId);
+      p.classList.add('drag'); p.style.zIndex = ++z;
+      sx = e.clientX; sy = e.clientY; ox = p.offsetLeft; oy = p.offsetTop;
+      p.style.left = ox + 'px'; p.style.top = oy + 'px';
+    });
+    p.addEventListener('pointermove', e => {
+      if (!p.classList.contains('drag')) return;
+      const b = p.parentElement;
+      p.style.left = clamp(ox + e.clientX - sx, -20, b.clientWidth - p.offsetWidth + 20) + 'px';
+      p.style.top  = clamp(oy + e.clientY - sy, -20, b.clientHeight - p.offsetHeight + 20) + 'px';
+    });
+    ['pointerup', 'pointercancel'].forEach(t => p.addEventListener(t, () => p.classList.remove('drag')));
+  });
+}
+
+/* ==========================================================================
+   START
+   ========================================================================== */
+function init() {
+  renderAbout();
+  renderCareer();
+  renderSkills();
+  renderProjects();
+  renderContact();
+  renderScrubs();
+  startTypewriter();
+  observeReveals();
+  initExtras();
+  frame();
+  if (location.hash.startsWith('#project-')) openProject(location.hash.slice(9));
+}
+init();
+</script>
+</body>
+</html>
