@@ -521,7 +521,7 @@ const SITE = {
   hero: {
     tag: 'Sheet 01 · Hello, world',
     greeting: 'HELLOOOO, I’m',
-    photo: { src: 'assets/pfp.jpeg', ar: '4/5', alt: 'Portrait of Maxwell' },
+    photo: { src: 'assets/life/pfp.jpeg', ar: '4/5', alt: 'Portrait of Maxwell' },
     caption: 'this is me :)',
   },
 
@@ -541,14 +541,14 @@ const SITE = {
   // Draggable polaroids under the intro. Add as many as you like.
   // Positions are randomised on every page load. To pin one, add  x: 10, y: 20, r: -5  (% across, % down, degrees).
   life: [
-    { caption: 'climbing',   media: { src: 'assets/climb.jpeg' } },
-    { caption: 'red (og)',   media: { src: 'assets/red.jpeg' } },
-    { caption: 'onyx (he bites)',   media: { src: 'assets/onyx.jpeg' } },
-    { caption: 'cupid (the bear)',   media: { src: 'assets/cupid.jpeg' } },
-    { caption: 'totoro (goatoro)',   media: { src: 'assets/totoro.jpeg' } },
-    { caption: 'at home garden',   media: { src: 'assets/garden.jpeg' } },
-    { caption: 'glass blowing',   media: { src: 'assets/glass_blowing.jpeg' } },
-    { caption: 'Alicia <3 (my gf)',   media: { src: 'assets/alicia.jpeg' } },
+    { caption: 'climbing',   media: { src: 'assets/life/climb.jpeg' } },
+    { caption: 'red (og)',   media: { src: 'assets/life/red.jpeg' } },
+    { caption: 'onyx (he bites)',   media: { src: 'assets/life/onyx.jpeg' } },
+    { caption: 'cupid (the bear)',   media: { src: 'assets/life/cupid.jpeg' } },
+    { caption: 'totoro (goatoro)',   media: { src: 'assets/life/totoro.jpeg' } },
+    { caption: 'at home garden',   media: { src: 'assets/life/garden.jpeg' } },
+    { caption: 'glass blowing',   media: { src: 'assets/life/glass_blowing.jpeg' } },
+    { caption: 'Alicia <3 (my gf)',   media: { src: 'assets/life/alicia.jpeg' } },
 
   ],
 
@@ -559,7 +559,7 @@ const SITE = {
       { role: 'Intern/Software Engineer', org: 'PeakActivity', when: 'Jul 2025 – now',
         blurb: 'I work as a consultant, creating software for clients per their request. I’ve learned so much from my fellow interns, peers, and seniors and can’t wait to see where my career goes.',
         bullets: ['Internal systems', 'Client work'],
-        media: { src: 'assets/peakActivity.jpeg', ar: '16/9' } },
+        media: { src: 'assets/life/peakActivity.jpeg', ar: '16/9' } },
 
       { role: 'Software member', org: 'IEEE @ UCF', when: 'Oct 2025 – now',
         blurb: 'I started my robotics career here with SECBOT. Went to Alabama with my team to compete at regionals.',
@@ -656,6 +656,28 @@ const SITE = {
           { type: 'pair', src: ['assets/projects/hackathon3.jpeg', 'assets/projects/hackathon5.jpeg'], caption: '' },
         ],
         github: 'https://github.com/cunkin375/tinytracer', demo: 'https://devpost.com/software/tiny-tracer' },
+
+      { id: 'drone', category: 'robotics', title: 'Anduril Grand Prix', year: '2026',
+        tagline: 'Create an optimized flight stack that will navigate a course in the shortest time',
+        cover: { src: 'assets/projects/drone.jpeg', ar: '4/3' },
+        role: 'Software (Vision)', team: 'Team of 6', duration: '2-3 months',
+        summary: 'This project partook just 2-3 months but for me was about a year of my time. I started out by learning the math that goes behind object detection, then found out about CNNs and started to develop my own from scratch. Finally when it came time to making the vision stack for this project, I had to scrap the hopes of implementing my own CNN from scratch, but along the way learned more about MobileNets, mavlink, and how to control a drone through simulation.',
+        blocks: [
+          { type: 'video', src: 'assets/projects/drone3.mp4', caption: 'Only this video would load, but basically here is one of the sim runs based off of the vision stack and controller that I developed with my team :)' },
+        ],
+        github: 'https://github.com/maxwelllokshin1/drone_vision_model', demo: '' },
+
+      { id: 'rl', category: 'reinforcement learning', title: 'Learning to learn', year: '2026',
+        tagline: 'I taught flappy bird how to fly through rl',
+        cover: { src: 'assets/projects/fb4.png', ar: '4/3' },
+        duration: '1 month',
+        summary: 'I wanted to spend some time learning RL and using a game like flappy bird was a great way to learn. State->Action->Reward seemed like an easy concept at first, but as you sit and try to develop a solution on what flappy bird should know about his surroundings to jump made this a bigger mind teaser than I would have expected.',
+        blocks: [
+          { type: 'image', src: 'assets/projects/fb.gif', caption: 'Run through. after 9000+ passes' },
+          { type: 'image', src: 'assets/projects/fb3.png', caption: 'Learning sequence with terminal.' },
+
+        ],
+        github: 'https://github.com/maxwelllokshin1/rl-flappybird', demo: '' },
     ],
   },
 
