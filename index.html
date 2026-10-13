@@ -516,7 +516,7 @@ button{font:inherit;color:inherit;cursor:pointer;background:none;border:0}
 const SITE = {
   name: 'Maxwell Lokshin',
   brand: 'ML',                                   // top-left logo text
-  roles: ['a robotics software engineer', 'a web app builder', 'a x1 hackathon winner', 'a hobbiest', 'a boulderer', 'a cat person', 'gardener'],
+  roles: ['an animatronics builder', 'a robotics software engineer', 'a web app builder', 'a hackathon 2nd-place finisher', 'a hobbyist', 'a boulderer', 'a cat person', 'a gardener'],
 
   hero: {
     tag: 'Sheet 01 · Hello, world',
@@ -527,19 +527,17 @@ const SITE = {
 
   story: {
     title: 'How I got <span class="hand">here</span>',
-    // Plain HTML strings. Use <b>…</b> for highlights.
     paragraphs: [
-      'In middle school I always loved robots, starting with my first ever competitions with lego mindstorm',
-      'From there I didn’t have much of a plan up until college when things went into full gear.',
-      'Now I look at projects on LinkedIn and tell myself "I can build that"',
-      'Outside the projects and clubs: I climb <b>v3-4</b>, I have <b>3</b> family cats and <b>1</b> cat of my own, and nature is my true calling',
+      'In middle school I fell for robots through my first competitions with <b>LEGO Mindstorms</b>.',
+      'I didn’t have much of a plan until college, when things went into full gear.',
+      'The moments I remember most from theme parks are the animatronic ones: a character that looks at you, reacts, and feels alive. That’s what I want to build for a living, which is why I made <b>Tubi</b>, a talking wizard frog, and why my race car has blinking eyes.',
+      'Now I look at projects on LinkedIn and tell myself "I can build that".',
+      'Outside the projects and clubs: I climb <b>v3-4</b>, I have <b>3</b> family cats and <b>1</b> cat of my own, and nature is my true calling.',
     ],
   },
 
-  ticker: ['bouldering', 'v4', 'robots', 'cats', 'hackathons', 'web apps', 'v3', 'CADing', 'gardening'],
+  ticker: ['animatronics', 'servos', 'robots', 'state machines', 'bouldering', 'v4', 'cats', 'hackathons', 'web apps', 'v3', 'CADing', 'gardening'],
 
-  // Draggable polaroids under the intro. Add as many as you like.
-  // Positions are randomised on every page load. To pin one, add  x: 10, y: 20, r: -5  (% across, % down, degrees).
   life: [
     { caption: 'climbing',   media: { src: 'assets/life/climb.jpeg' } },
     { caption: 'red (og)',   media: { src: 'assets/life/red.jpeg' } },
@@ -549,36 +547,45 @@ const SITE = {
     { caption: 'at home garden',   media: { src: 'assets/life/garden.jpeg' } },
     { caption: 'glass blowing',   media: { src: 'assets/life/glass_blowing.jpeg' } },
     { caption: 'Alicia <3 (my gf)',   media: { src: 'assets/life/alicia.jpeg' } },
-
   ],
 
   career: {
     title: 'The route <span class="hand">so far</span>',
     lede: 'Every job is a pitch. Scroll and the rope fills in as I climb to the top.',
     items: [
-      { role: 'Intern/Software Engineer', org: 'PeakActivity', when: 'Jul 2025 – now',
-        blurb: 'I work as a consultant, creating software for clients per their request. I’ve learned so much from my fellow interns, peers, and seniors and can’t wait to see where my career goes.',
-        bullets: ['Internal systems', 'Client work'],
+      // TODO: add one bullet with your stack and a measurable outcome for PeakActivity
+      { role: 'Software Engineer', org: 'PeakActivity', when: 'Jul 2025 – now',
+        blurb: 'I work as a consultant, building software for clients to their requirements. I’ve learned a lot from the interns, peers, and senior engineers around me and can’t wait to see where my career goes.',
+        bullets: ['Consult with clients to turn requirements into backend designs', 'Build and maintain backend systems alongside senior engineers'],
         media: { src: 'assets/life/peakActivity.jpeg', ar: '16/9' } },
 
-      { role: 'Software member', org: 'IEEE @ UCF', when: 'Oct 2025 – now',
-        blurb: 'I started my robotics career here with SECBOT. Went to Alabama with my team to compete at regionals.',
-        bullets: ['Worked on: [perception, navigation(d*lite), controllers, etc...]', 'Won 8th in regionals', 'Gained new friendships'],
+      { role: 'Software Member', org: 'IEEE @ UCF', when: 'Oct 2025 – now',
+        blurb: 'This is where my robotics career started, with SECBOT. My team traveled to Alabama to compete at regionals and placed 8th.',
+        bullets: [
+          'D* Lite path planning in C++ through NAV2, plus a perception-to-goal system',
+          'OpenCV detection pipeline with a live HSV color-tuning GUI',
+          'Custom UWB ROS 2 plugin for field-relative localization in Gazebo',
+          '8th place at regionals',
+        ],
         media: { src: 'assets/projects/ieee.jpg', ar: '16/9' } },
-      
-        { role: 'Project lead', org: 'AIRACERS [TEAM: Nice Green Machines] @ UCF', when: 'March 2026 – now',
-        blurb: 'This is where my interest in robotics starts to accel, pushing me further than I’ve ever gone. As a team we build a custom autonomous car from scratch using LIDAR as our eyes and a jettson nano as our brain. We competed locally to see who would get first place based on how good code is and design of the car.',
-        bullets: ['Worked on: [Docker environment, worked on jettson directly, custom pathing controller using pure pursuit]', 'Out of 5 minutes: [9 total laps, fastest lap of 24 seconds]', 'Custom car'],
+
+      { role: 'Project Lead', org: 'AIRACERS (Team: Nice Green Machines) @ UCF', when: 'March 2026 – now',
+        blurb: 'This is where my interest in robotics really accelerated and pushed me further than I’d ever gone. As a team we built a custom autonomous car from scratch, using LiDAR as its eyes and a Jetson TX2 as its brain. We competed locally in a contest judged on our code and the design of the car.',
+        bullets: [
+          'Led software, electrical, and mechanical teams to deliver the car in 3 weeks',
+          'Hybrid pure pursuit and dual wall-follow controller with dynamic mode switching',
+          'Result: 9 laps in 5 minutes, fastest lap 24 seconds',
+          'Gym-ROS and RViz simulation in Docker; VESC integration on the Jetson',
+        ],
         media: { src: 'assets/projects/AIRACERS.JPG', ar: '16/9' } },
     ],
   },
 
-  // Frame-by-frame scroll animations. See the "SCRUB" section of the guide.
-  // Leave the array empty to hide. `after` = id of the section to insert it below.
+  // Climbing scroll animation. 501 frames can be heavy on phones: consider fewer or smaller frames.
   scrubs: [
     { after: 'career',
-      frames: 'assets/frames/climb/{n}.jpg',   // {n} becomes 0001, 0002, …
-      ar: '9/16',                                  // your video is portrait
+      frames: 'assets/frames/climb/{n}.jpg',
+      ar: '9/16',
       count: 501, start: 1, pad: 4, height: '620vh',
       captions: [
         { at: 0.05, text: 'start low…' },
@@ -589,93 +596,139 @@ const SITE = {
 
   skills: {
     title: 'The <span class="hand">tools</span>',
-    lede: 'Bars are honest self-ratings: more yellow = more mileage.',
+    lede: 'What I reach for most, grouped by what I use it for.',
+    // Plain strings now. No ratings.
     groups: [
-      { name: 'Robotics',  items: [['ROS 2', 4], ['C++', 4], ['Python', 5], ['CAD / Fusion360', 3], ['Embedded / Arduino', 3]] },
-      { name: 'Web',       items: [['JavaScript / TypeScript', 4], ['React', 4], ['Node.js', 4], ['HTML + CSS', 5], ['SQL/MongoDB', 4]] },
-      { name: 'Hacking',   items: [['Prototyping', 5], ['Computer vision', 5], ['ML + RL', 5], ['APIs + connections', 5], ['Pitching', 5]] },
-      { name: 'Off-screen', items: [['Bouldering', 3], ['Cat wrangling', 5]]},
+      { name: 'Animatronics & Embedded', items: ['ESP32', 'Arduino', 'Raspberry Pi', 'Servo control', 'State machines', 'UART / serial', 'Audio playback'] },
+      { name: 'Robotics', items: ['ROS 2', 'NAV2', 'C++', 'Python', 'OpenCV', 'Gazebo / RViz', 'Docker', 'Fusion 360'] },
+      { name: 'Web & APIs', items: ['TypeScript / JavaScript', 'React', 'Node.js / Express', 'HTML + CSS', 'SQL / MongoDB', 'WebSockets', 'OpenAI / ElevenLabs / Whisper'] },
+      { name: 'AI', items: ['Computer vision', 'MobileNet', 'Reinforcement learning', 'Machine learning'] },
+      { name: 'Off-screen', items: ['Bouldering (V3–4)', 'Cat wrangling'] },
     ],
   },
 
   projects: {
     title: 'Stuff I <span class="hand">built</span>',
     lede: 'Hover a sheet to peek at it. Click to open the full drawing.',
-    // category must be one of: robotics | web | hackathon  (rename freely: filters are generated)
+    // category must be one of: animatronics | robotics | web  (rename freely: filters are generated)
     items: [
-      { id: 'car', category: 'robotics', title: 'Nice Green Machines (NGM)', year: '2026',
-        tagline: 'Autonomous racecar that navigates a track',
-        cover: { src: 'assets/projects/AIRACER2.JPG', ar: '4/3' },
-        role: 'Software', team: 'Team of 3', duration: '3 Weeks',
-        tags: ['ROS 2', 'LIDAR2D', 'Python', 'Makerworld', 'RVIZ'],
-        summary: 'This was one of the most fun projects I’ve done up to this point in my career since I could work along side both of my friends from highschool. I was able to really push forward my love for robotics through simulation in RVIZ while learning more of what it takes to make a robot move. I loved how hands on this project was and the team that I could work with.',
+      // TODO: set the real file names for the Tubi assets, add github/demo links, and a team size if you want one
+      { id: 'tubi', category: 'animatronics', title: 'Tubi the Frog', year: '2026',
+        tagline: 'An animatronic wizard you can talk to',
+        cover: { src: 'assets/projects/tubi-cover.jpg', ar: '4/3' },
+        role: 'Embedded (ESP32 state machine, servos, audio)', duration: 'Hackathon',
+        tags: ['ESP32', 'Raspberry Pi', 'WebSockets', 'Whisper', 'OpenAI', 'ElevenLabs', 'React', 'Node.js'],
+        summary: 'Inspired by the animatronic characters at theme parks that talk, react, and make guests feel like they’ve stepped into a story. Tap your phone on the NFC chip to wake Tubi, hold the crystal ball on your screen to talk, and answer his ridiculous hypotheticals. After a back-and-forth he reads your destiny and tells you what kind of magic user you are.',
         blocks: [
-          { type: 'text',  title: 'The problem', html: '<p>We needed to make a bunch of plastic <b>drive itself</b> in the shortest amount of time.</p>' },
-          { type: 'video', src: 'assets/projects/comprun.mp4', caption: 'The comp run!!!' },
-          { type: 'video', src: 'assets/projects/testrun.mp4', caption: 'Test run num. idk' },
-          { type: 'image', src: 'assets/projects/sim.png', caption: 'Sim' },
-          { type: 'text',  title: 'What I learned', html: '<p>Hardest part through all of this, was the limited time and our ambitiousness to make a perfect car within 3 weeks. But we found that if there’s a will there’s a way. Which is why we plan on coming back even stronger!!</p>' },
+          { type: 'video', src: 'assets/projects/tubi-demo.mp4', caption: 'Talking with Tubi' },
+          { type: 'text', title: 'How it works', html: '<p>The workload is split across three devices so none gets overloaded. The <b>web app</b> records your voice and turns it into text with Whisper, then sends it over a WebSocket. A <b>Raspberry Pi</b> hosts the site, feeds the text to an LLM, and turns the reply into speech with ElevenLabs. An <b>ESP32</b> receives the response over serial and runs a custom state machine that plays the audio and moves the servos based on the words in each package.</p>' },
+          { type: 'text', title: 'The hard part', html: '<p>Speaker output kept coming out as static or silence. Audio bytes and servo commands were sharing one serial connection, which blocked the audio and put noise in the amplifier. Giving each its own UART line fixed it. Then a 3D print failed in the last hours of the hackathon and we had to rethink the build, so servos, cardboard, and paint carried the final version.</p>' },
+          { type: 'text', title: 'What I learned', html: '<p>The first idea is rarely the one that crosses the finish line. Improvising when a plan breaks is a skill, and this project forced me to practice it.</p>' },
+        ],
+        github: '', demo: '' },
+
+      // TODO: update this card as the car comes together (lap times, eye-tracking performance, final expression list)
+      { id: 'mcqueen', category: 'animatronics', title: 'Lightning McQueen (in progress)', year: '2026',
+        tagline: 'An autonomous race car with a face',
+        cover: { src: 'assets/projects/mcqueen-cover.jpg', ar: '4/3' },
+        role: 'Project Lead', duration: 'In progress',
+        tags: ['F1TENTH', 'OLED eyes', 'Human detection', 'ROS 2'],
+        summary: 'For our second F1TENTH competition, with nationals as the goal, the car is dressed as Lightning McQueen. I built two OLED eyes from scratch that blink and follow people using a human-detection model, and the car plays “Ka-chow” through onboard speakers.',
+        blocks: [
+          { type: 'video', src: 'assets/projects/mcqueen-eyes.mp4', caption: 'The eyes tracking a person' },
+          { type: 'text', title: 'What’s next', html: '<p>Expressions tied to what the car is doing: focused when armed, surprised near a wall, excited on a fast lap. A Raspberry Pi will send commands for the eyes, servo, and motor, and a Nintendo Switch controller will act as a dead man’s switch so the car only runs while I’m holding the button.</p>' },
+        ],
+        github: '', demo: '' },
+
+      // TODO: add a photo and any details you can share (servo count, motion approach, results)
+      { id: 'scorpion', category: 'animatronics', title: 'Animatronic Scorpion (in progress)', year: '2026',
+        tagline: 'Coordinated motion across a 13+ servo animatronic',
+        cover: { src: 'assets/projects/scorpion.jpg', ar: '4/3' },
+        role: 'Software Member (embedded firmware + state machine)', duration: 'In progress',
+        tags: ['Embedded', 'State machines', 'Servo control'],
+        summary: 'I’m writing the embedded firmware and the state machine for an animatronic scorpion with 13 or more servos that have to move together.',
+        blocks: [
+          { type: 'text', title: 'The challenge', html: '<p>Every joint has to move as part of one body, not 13 separate motors. That means coordinating timing across all of them while staying inside the power and safety limits of the hardware.</p>' },
+        ],
+        github: '', demo: '' },
+
+      { id: 'car', category: 'robotics', title: 'Nice Green Machines (NGM)', year: '2026',
+        tagline: 'Autonomous race car that navigates a track',
+        cover: { src: 'assets/projects/AIRACER2.JPG', ar: '4/3' },
+        role: 'Project Lead (Software)', team: 'Team of 3', duration: '3 Weeks',
+        tags: ['ROS 2', '2D LiDAR', 'Python', 'Pure pursuit', 'RViz', 'Docker'],
+        summary: 'One of the most fun projects I’ve done so far, partly because I got to work alongside two friends from high school. I pushed my love for robotics forward through simulation in RViz while learning what it takes to make a robot move, and I loved how hands-on it was.',
+        blocks: [
+          { type: 'text', title: 'The problem', html: '<p>We needed a plastic car to <b>drive itself</b> around a track in the shortest time possible.</p>' },
+          { type: 'video', src: 'assets/projects/comprun.mp4', caption: 'The competition run' },
+          { type: 'video', src: 'assets/projects/testrun.mp4', caption: 'A test run' },
+          { type: 'image', src: 'assets/projects/sim.png', caption: 'The simulation' },
+          { type: 'text', title: 'What I learned', html: '<p>The hardest part was the limited time and our ambition to build a perfect car in 3 weeks. We found that where there’s a will there’s a way, which is why we’re coming back stronger.</p>' },
         ],
         github: 'https://github.com/Ai-racer-club/AI-Racer-2026', demo: '' },
 
       { id: 'rover', category: 'robotics', title: 'SECBOT w/ IEEE', year: '2025-2026',
-        tagline: 'Autonomous rover that completes tasks and collects ducks.',
-        cover: { src: 'assets/projects/duck.jpeg' }, tags: ['Arduino', 'Python', 'Computer Vision', 'ros2', 'Sim'],
+        tagline: 'Autonomous rover that completes tasks and collects ducks',
+        cover: { src: 'assets/projects/duck.jpeg' },
+        tags: ['C++', 'Python', 'ROS 2', 'NAV2', 'OpenCV', 'Gazebo', 'UWB'],
         role: 'Software Member', team: 'Team of 4 - 8', duration: '5 Months',
-        summary: 'This is where the robotics interest sparked again. This project was so much fun and gave me the opportunity to build my own vision, nav, and control system all from scratch.', 
+        summary: 'This is where my robotics interest sparked. I built vision, navigation, and control pieces from scratch: D* Lite path planning through NAV2, an OpenCV detection pipeline with a live color-tuning GUI, and a UWB localization plugin for Gazebo. We placed 8th at regionals.',
         blocks: [
-          { type: 'image', src: 'assets/projects/nav.jpeg', caption: 'Nav in sim' },
-          { type: 'image', src: 'assets/projects/ieee4.jpeg', caption: 'Steeling duck from team lead' },
-          { type: 'pair', src: ['assets/projects/conference.jpg', 'assets/projects/ieee.jpg'], caption: 'Conference w/ everyone and TEAM!!!' },
+          { type: 'image', src: 'assets/projects/nav.jpeg', caption: 'Navigation in simulation' },
+          { type: 'image', src: 'assets/projects/ieee4.jpeg', caption: 'Stealing the duck from the team lead' },
+          { type: 'pair', src: ['assets/projects/conference.jpg', 'assets/projects/ieee.jpg'], caption: 'The whole team at the conference' },
           { type: 'pair', src: ['assets/projects/ieee2.jpeg', 'assets/projects/ieee3.jpeg'], caption: 'The end' }
         ],
         github: 'https://github.com/maxwelllokshin1/ieee' },
 
-      { id: 'sports', category: 'web', title: 'SquadUp', year: '2026',
-        tagline: 'App used to make pickup game postings for UCF students',
-        cover: { src: 'assets/projects/squadup1.jpeg', ar: '4/3' },
-        role: 'Project Lead', team: 'Team of 6', duration: '1.5 Months',
-        tags: ['TypeScript', 'MongoDB', 'Remote Server', 'React'],
-        summary: 'This was one of the first times I used react in a project sense as well as leading a team like this. I was a great pleasure to work with every person in this group as completing a project like this didn’t feel like it was a class project, but rather something fun.',
-        blocks: [
-          { type: 'text',  title: 'The problem', html: '<p>We found ourselves struggling to find good pickup games at times that we wanted to go to the field.</p>' },
-          { type: 'text',  title: 'Solution', html: '<p>We developed this app so UCF students would make planning for pickup games easier rather than guessing if anyone was on the field at that time.</p>' },
-          { type: 'pair', src: ['assets/projects/squadup1.jpeg', 'assets/projects/squadup2.jpeg'], caption: '' },
-          { type: 'pair', src: ['assets/projects/squadup3.jpeg', 'assets/projects/squadup4.jpeg', 'assets/projects/squadup5.jpeg'], caption: '' },
-        ],
-        github: 'https://github.com/SquadUp-UCF', demo: '' },
-
+      // TODO: add the hackathon name to the tagline or summary if you want it
       { id: 'raytracing', category: 'web', title: 'TinyTracer', year: '2026',
-        tagline: 'Web App with a custom simulator and ray tracer [HACKATHON WINNER]',
+        tagline: '2nd place, sponsor track: a web simulator with a custom ray tracer',
         cover: { src: 'assets/projects/hackathon4.jpeg', ar: '4/3' },
         role: 'Software', team: 'Team of 3', duration: '12 hours',
-        summary: 'First ever hackathon and I learned so much. The whole idea of this project was to have users place a solar panel in the most optimal position to get the most sunlight/savings potential. This was such a fun project and creating a custom simulator in a web app was my part.',
+        tags: ['Ray tracing', 'Web app', 'Simulation'],
+        summary: 'My first hackathon, and I learned a lot. Users position a solar panel in a custom simulator and the built-in compiler uses ray tracing to score how much sunlight that placement captures. Building the simulator from scratch in the browser was my part.',
         blocks: [
-          { type: 'image', src: 'assets/projects/hackathon1.jpeg', caption: 'me!' },
-          { type: 'image', src: 'assets/projects/hackathon2.jpeg', caption: 'THE WIN!!!!' },
+          { type: 'image', src: 'assets/projects/hackathon1.jpeg', caption: 'Me at the hackathon' },
+          { type: 'image', src: 'assets/projects/hackathon2.jpeg', caption: 'Celebrating the 2nd-place finish' },
           { type: 'pair', src: ['assets/projects/hackathon3.jpeg', 'assets/projects/hackathon5.jpeg'], caption: '' },
         ],
         github: 'https://github.com/cunkin375/tinytracer', demo: 'https://devpost.com/software/tiny-tracer' },
 
       { id: 'drone', category: 'robotics', title: 'Anduril Grand Prix', year: '2026',
-        tagline: 'Create an optimized flight stack that will navigate a course in the shortest time',
+        tagline: 'Vision stack for an autonomous racing drone',
         cover: { src: 'assets/projects/drone.jpeg', ar: '4/3' },
         role: 'Software (Vision)', team: 'Team of 6', duration: '2-3 months',
-        summary: 'This project partook just 2-3 months but for me was about a year of my time. I started out by learning the math that goes behind object detection, then found out about CNNs and started to develop my own from scratch. Finally when it came time to making the vision stack for this project, I had to scrap the hopes of implementing my own CNN from scratch, but along the way learned more about MobileNets, mavlink, and how to control a drone through simulation.',
+        tags: ['MobileNet', 'MAVLink', 'Computer vision', 'Simulation'],
+        summary: 'The project ran 2-3 months, but for me it was closer to a year of learning. I started with the math behind object detection, moved on to CNNs, and began building my own from scratch. For the final vision stack I switched to MobileNet, and along the way I learned MAVLink and how to control a drone in simulation.',
         blocks: [
-          { type: 'video', src: 'assets/projects/drone3.mp4', caption: 'Only this video would load, but basically here is one of the sim runs based off of the vision stack and controller that I developed with my team :)' },
+          { type: 'video', src: 'assets/projects/drone3.mp4', caption: 'A simulation run driven by the vision stack and controller my team and I built' },
         ],
         github: 'https://github.com/maxwelllokshin1/drone_vision_model', demo: '' },
 
-      { id: 'rl', category: 'reinforcement learning', title: 'Learning to learn', year: '2026',
-        tagline: 'I taught flappy bird how to fly through rl',
+      { id: 'sports', category: 'web', title: 'SquadUp', year: '2026',
+        tagline: 'An app for posting pickup games for UCF students',
+        cover: { src: 'assets/projects/squadup1.jpeg', ar: '4/3' },
+        role: 'Project Lead', team: 'Team of 6', duration: '1.5 Months',
+        tags: ['TypeScript', 'MongoDB', 'Remote Server', 'React'],
+        summary: 'One of the first times I used React on a real project, and my first time leading a team this size. It was a great pleasure to work with everyone in the group, and it never felt like a class project, just something fun.',
+        blocks: [
+          { type: 'text', title: 'The problem', html: '<p>We kept struggling to find good pickup games at the times we wanted to go to the field.</p>' },
+          { type: 'text', title: 'Solution', html: '<p>We built an app so UCF students can plan pickup games instead of guessing whether anyone is on the field.</p>' },
+          { type: 'pair', src: ['assets/projects/squadup1.jpeg', 'assets/projects/squadup2.jpeg'], caption: '' },
+          { type: 'pair', src: ['assets/projects/squadup3.jpeg', 'assets/projects/squadup4.jpeg', 'assets/projects/squadup5.jpeg'], caption: '' },
+        ],
+        github: 'https://github.com/SquadUp-UCF', demo: '' },
+
+      { id: 'rl', category: 'robotics', title: 'Learning to learn', year: '2026',
+        tagline: 'I taught Flappy Bird to fly with reinforcement learning',
         cover: { src: 'assets/projects/fb4.png', ar: '4/3' },
         duration: '1 month',
-        summary: 'I wanted to spend some time learning RL and using a game like flappy bird was a great way to learn. State->Action->Reward seemed like an easy concept at first, but as you sit and try to develop a solution on what flappy bird should know about his surroundings to jump made this a bigger mind teaser than I would have expected.',
+        tags: ['Reinforcement learning', 'Python'],
+        summary: 'I wanted to learn reinforcement learning, and Flappy Bird was a great way in. State, action, reward seemed simple at first, but deciding what the bird should know about its surroundings to decide when to jump turned out to be a bigger puzzle than I expected.',
         blocks: [
-          { type: 'image', src: 'assets/projects/fb.gif', caption: 'Run through. after 9000+ passes' },
-          { type: 'image', src: 'assets/projects/fb3.png', caption: 'Learning sequence with terminal.' },
-
+          { type: 'image', src: 'assets/projects/fb.gif', caption: 'A run after 9000+ passes' },
+          { type: 'image', src: 'assets/projects/fb3.png', caption: 'The learning sequence in the terminal' },
         ],
         github: 'https://github.com/maxwelllokshin1/rl-flappybird', demo: '' },
     ],
@@ -683,16 +736,16 @@ const SITE = {
 
   contact: {
     title: 'Let’s <span class="hand">talk.</span>',
-    lede: 'Robots, code, climbing, cat photos - all are welcome.',
-    email: 'maxwell.lokshin@2zick.com',                     // ← copy-to-clipboard button
+    lede: 'Robots, code, animatronics, climbing, cat photos - all are welcome.',
+    // Matches the résumé. Swap to your 2zick.com address in both places if you prefer it.
+    email: 'ma774660@ucf.edu',
     github: 'https://github.com/maxwelllokshin1',
     linkedin: 'https://www.linkedin.com/in/maxwelllokshin',
-    resume: 'assets/resume.pdf',                  // drop your PDF here
+    resume: 'assets/Maxwell_Lokshin_Resume.pdf',
     footLeft: '© ' + new Date().getFullYear() + ' Maxwell Lokshin',
     footRight: 'hand-drafted on a blueprint',
   },
 };
-
 /* ==========================================================================
    ENGINE (you shouldn't need to touch anything below)
    ========================================================================== */
