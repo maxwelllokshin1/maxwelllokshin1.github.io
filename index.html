@@ -9,7 +9,10 @@
 <meta property="og:title" content="Maxwell Lokshin — Animatronics &amp; Robotics Software">
 <meta property="og:description" content="UCF computer science student building animatronics, autonomous robots, and interactive characters.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐸</text></svg>">
-  
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+
 <!--
   ┌──────────────────────────────────────────────────────────────────────┐
   │  HOW THIS FILE IS ORGANISED                                          │
@@ -557,15 +560,18 @@ const SITE = {
       // TODO: add one bullet with your stack and a measurable outcome for PeakActivity
       { role: 'Software Engineer', org: 'PeakActivity', when: 'Jul 2025 – now',
         blurb: 'I work as a consultant, building software for clients to their requirements. I’ve learned a lot from the interns, peers, and senior engineers around me and can’t wait to see where my career goes.',
-        bullets: ['Consult with clients to turn requirements into backend designs', 'Build and maintain backend systems alongside senior engineers'],
+        bullets: [
+          'Consult directly with clients to understand technical requirements and contribute to backend solution design',
+          'Build and maintain backend systems applying industry best practices under the guidance of senior engineers',
+          'Learn and apply new coding practices across projects to strengthen full-stack development skills',
+        ],
         media: { src: 'assets/life/peakActivity.jpeg', ar: '16/9' } },
 
       { role: 'Software Member', org: 'IEEE @ UCF', when: 'Oct 2025 – now',
         blurb: 'This is where my robotics career started, with SECBOT. My team traveled to Alabama to compete at regionals and placed 8th.',
         bullets: [
-          'D* Lite path planning in C++ through NAV2, plus a perception-to-goal system',
-          'OpenCV detection pipeline with a live HSV color-tuning GUI',
-          'Custom UWB ROS 2 plugin for field-relative localization in Gazebo',
+          'D* Lite path planning in C++ on a grid-based map',
+          'Real-time color vision model that detects ducks on the field across different missions (trials)',
           '8th place at regionals',
         ],
         media: { src: 'assets/projects/ieee.jpg', ar: '16/9' } },
@@ -573,12 +579,19 @@ const SITE = {
       { role: 'Project Lead', org: 'AIRACERS (Team: Nice Green Machines) @ UCF', when: 'March 2026 – now',
         blurb: 'This is where my interest in robotics really accelerated and pushed me further than I’d ever gone. As a team we built a custom autonomous car from scratch, using LiDAR as its eyes and a Jetson TX2 as its brain. We competed locally in a contest judged on our code and the design of the car.',
         bullets: [
-          'Led software, electrical, and mechanical teams to deliver the car in 3 weeks',
           'Hybrid pure pursuit and dual wall-follow controller with dynamic mode switching',
           'Result: 9 laps in 5 minutes, fastest lap 24 seconds',
-          'Gym-ROS and RViz simulation in Docker; VESC integration on the Jetson',
+          'Gym-ROS and RViz simulation in Docker; VESC messages integrated on the Jetson TX2',
+          'Custom car built from scratch in 3 weeks',
         ],
         media: { src: 'assets/projects/AIRACERS.JPG', ar: '16/9' } },
+
+      { role: 'Software Member', org: 'STEEL @ UCF', when: 'Oct 2026 – now',
+        blurb: 'I write the embedded firmware and state machine for an animatronic scorpion whose 21 servos have to move together as one body.',
+        bullets: [
+          'ESP32 firmware that coordinates 21 servos',
+          'State machine for synchronized, animated motion',
+        ] },
     ],
   },
 
@@ -600,7 +613,7 @@ const SITE = {
     lede: 'What I reach for most, grouped by what I use it for.',
     // Plain strings now. No ratings.
     groups: [
-      { name: 'Animatronics & Embedded', items: ['ESP32', 'Arduino', 'Raspberry Pi', 'Servo control', 'State machines', 'UART / serial', 'Audio playback'] },
+      { name: 'Animatronics & Embedded', items: ['ESP32', 'Arduino', 'Raspberry Pi', 'Servo control', 'Animation', 'State machines', 'UART / serial', 'Audio playback'] },
       { name: 'Robotics', items: ['ROS 2', 'NAV2', 'C++', 'Python', 'OpenCV', 'Gazebo / RViz', 'Docker', 'Fusion 360'] },
       { name: 'Web & APIs', items: ['TypeScript / JavaScript', 'React', 'Node.js / Express', 'HTML + CSS', 'SQL / MongoDB', 'WebSockets', 'OpenAI / ElevenLabs / Whisper'] },
       { name: 'AI', items: ['Computer vision', 'MobileNet', 'Reinforcement learning', 'Machine learning'] },
@@ -618,11 +631,11 @@ const SITE = {
         tagline: 'An animatronic wizard you can talk to',
         cover: { src: 'assets/projects/tubi-cover.jpg', ar: '4/3' },
         role: 'Embedded (ESP32 state machine, servos, audio)', duration: 'Hackathon',
-        tags: ['ESP32', 'Raspberry Pi', 'WebSockets', 'Whisper', 'OpenAI', 'ElevenLabs', 'React', 'Node.js'],
+        tags: ['ESP32', 'Raspberry Pi', 'WebSockets', 'Whisper', 'OpenAI', 'ElevenLabs', 'React', 'Node.js', 'Animation'],
         summary: 'Inspired by the animatronic characters at theme parks that talk, react, and make guests feel like they’ve stepped into a story. Tap your phone on the NFC chip to wake Tubi, hold the crystal ball on your screen to talk, and answer his ridiculous hypotheticals. After a back-and-forth he reads your destiny and tells you what kind of magic user you are.',
         blocks: [
           { type: 'video', src: 'assets/projects/tubi-demo.mp4', caption: 'Talking with Tubi' },
-          { type: 'text', title: 'How it works', html: '<p>The workload is split across three devices so none gets overloaded. The <b>web app</b> records your voice and turns it into text with Whisper, then sends it over a WebSocket. A <b>Raspberry Pi</b> hosts the site, feeds the text to an LLM, and turns the reply into speech with ElevenLabs. An <b>ESP32</b> receives the response over serial and runs a custom state machine that plays the audio and moves the servos based on the words in each package.</p>' },
+          { type: 'text', title: 'How it works', html: '<p>The workload is split across three devices so none gets overloaded. The <b>web app</b> records your voice and turns it into text with Whisper, then sends it over a WebSocket. A <b>Raspberry Pi</b> hosts the site, feeds the text to an LLM through the OpenAI API, and turns the reply into speech with ElevenLabs. An <b>ESP32</b> receives the response over serial and runs a custom state machine that plays the audio and moves the servos based on the words in each package.</p>' },
           { type: 'text', title: 'The hard part', html: '<p>Speaker output kept coming out as static or silence. Audio bytes and servo commands were sharing one serial connection, which blocked the audio and put noise in the amplifier. Giving each its own UART line fixed it. Then a 3D print failed in the last hours of the hackathon and we had to rethink the build, so servos, cardboard, and paint carried the final version.</p>' },
           { type: 'text', title: 'What I learned', html: '<p>The first idea is rarely the one that crosses the finish line. Improvising when a plan breaks is a skill, and this project forced me to practice it.</p>' },
         ],
@@ -632,24 +645,24 @@ const SITE = {
       { id: 'mcqueen', category: 'animatronics', title: 'Lightning McQueen (in progress)', year: '2026',
         tagline: 'An autonomous race car with a face',
         cover: { src: 'assets/projects/mcqueen-cover.jpg', ar: '4/3' },
-        role: 'Project Lead', duration: 'In progress',
-        tags: ['F1TENTH', 'OLED eyes', 'Human detection', 'ROS 2'],
-        summary: 'For our second F1TENTH competition, with nationals as the goal, the car is dressed as Lightning McQueen. I built two OLED eyes from scratch that blink and follow people using a human-detection model, and the car plays “Ka-chow” through onboard speakers.',
+        role: 'Software (autonomy + OLED eyes)', duration: 'In progress',
+        tags: ['F1TENTH', 'ROS 2', 'ESP32', 'Computer vision', 'LiDAR', 'OLED eyes'],
+        summary: 'For our second F1TENTH competition, with nationals as the goal, the car is dressed as Lightning McQueen. I built two OLED eyes from scratch that blink and follow people using a human-detection model, wrote a custom wall-following algorithm, and added speed-up and slow-down commands that update dynamically for each track size. The car plays “Ka-chow” through onboard speakers.',
         blocks: [
           { type: 'video', src: 'assets/projects/mcqueen-eyes.mp4', caption: 'The eyes tracking a person' },
-          { type: 'text', title: 'What’s next', html: '<p>Expressions tied to what the car is doing: focused when armed, surprised near a wall, excited on a fast lap. A Raspberry Pi will send commands for the eyes, servo, and motor, and a Nintendo Switch controller will act as a dead man’s switch so the car only runs while I’m holding the button.</p>' },
+          { type: 'text', title: 'What’s next', html: '<p>Expressions tied to what the car is doing: focused when armed, surprised near a wall, excited on a fast lap. A Nintendo Switch controller will act as a dead man’s switch so the car only runs while I’m holding the button.</p>' },
         ],
         github: '', demo: '' },
 
-      // TODO: add a photo and any details you can share (servo count, motion approach, results)
+      // TODO: add a photo and any details you can share (motion approach, results)
       { id: 'scorpion', category: 'animatronics', title: 'Animatronic Scorpion (in progress)', year: '2026',
-        tagline: 'Coordinated motion across a 13+ servo animatronic',
+        tagline: 'Synchronized motion across 21 servos',
         cover: { src: 'assets/projects/scorpion.jpg', ar: '4/3' },
-        role: 'Software Member (embedded firmware + state machine)', duration: 'In progress',
-        tags: ['Embedded', 'State machines', 'Servo control'],
-        summary: 'I’m writing the embedded firmware and the state machine for an animatronic scorpion with 13 or more servos that have to move together.',
+        role: 'Software Member (embedded firmware + state machine)', team: 'STEEL @ UCF', duration: 'In progress',
+        tags: ['ESP32', 'Embedded', 'Servo control', 'State machines', 'Animation'],
+        summary: 'With STEEL @ UCF, I’m writing the embedded firmware and the state machine for an animatronic scorpion. An ESP32 coordinates 21 servos that have to move together in synchronized, animated motion.',
         blocks: [
-          { type: 'text', title: 'The challenge', html: '<p>Every joint has to move as part of one body, not 13 separate motors. That means coordinating timing across all of them while staying inside the power and safety limits of the hardware.</p>' },
+          { type: 'text', title: 'The challenge', html: '<p>Every joint has to move as part of one body, not 21 separate motors. That means coordinating timing across all of them while staying inside the power and safety limits of the hardware.</p>' },
         ],
         github: '', demo: '' },
 
@@ -671,9 +684,9 @@ const SITE = {
       { id: 'rover', category: 'robotics', title: 'SECBOT w/ IEEE', year: '2025-2026',
         tagline: 'Autonomous rover that completes tasks and collects ducks',
         cover: { src: 'assets/projects/duck.jpeg' },
-        tags: ['C++', 'Python', 'ROS 2', 'NAV2', 'OpenCV', 'Gazebo', 'UWB'],
+        tags: ['C++', 'Python', 'ROS 2', 'OpenCV', 'Gazebo', 'Docker'],
         role: 'Software Member', team: 'Team of 4 - 8', duration: '5 Months',
-        summary: 'This is where my robotics interest sparked. I built vision, navigation, and control pieces from scratch: D* Lite path planning through NAV2, an OpenCV detection pipeline with a live color-tuning GUI, and a UWB localization plugin for Gazebo. We placed 8th at regionals.',
+        summary: 'This is where my robotics interest sparked. This project gave me the opportunity to build my own vision, nav, and control system from scratch: D* Lite path planning in C++ on a grid-based map, and a real-time color vision model that detects ducks on the field across the different missions (trials). We placed 8th at regionals.',
         blocks: [
           { type: 'image', src: 'assets/projects/nav.jpeg', caption: 'Navigation in simulation' },
           { type: 'image', src: 'assets/projects/ieee4.jpeg', caption: 'Stealing the duck from the team lead' },
@@ -684,11 +697,11 @@ const SITE = {
 
       // TODO: add the hackathon name to the tagline or summary if you want it
       { id: 'raytracing', category: 'web', title: 'TinyTracer', year: '2026',
-        tagline: '2nd place, sponsor track: a web simulator with a custom ray tracer',
+        tagline: '2nd place, OneEthos sponsor track: a web simulator with a custom ray tracer',
         cover: { src: 'assets/projects/hackathon4.jpeg', ar: '4/3' },
         role: 'Software', team: 'Team of 3', duration: '12 hours',
         tags: ['Ray tracing', 'Web app', 'Simulation'],
-        summary: 'My first hackathon, and I learned a lot. Users position a solar panel in a custom simulator and the built-in compiler uses ray tracing to score how much sunlight that placement captures. Building the simulator from scratch in the browser was my part.',
+        summary: 'My first hackathon, and I learned a lot. We placed 2nd in the OneEthos sponsor track. Users position a solar panel in a custom simulator and the built-in compiler uses ray tracing to score how much sunlight that placement captures. Building the simulator from scratch in the browser was my part.',
         blocks: [
           { type: 'image', src: 'assets/projects/hackathon1.jpeg', caption: 'Me at the hackathon' },
           { type: 'image', src: 'assets/projects/hackathon2.jpeg', caption: 'Celebrating the 2nd-place finish' },
@@ -747,6 +760,7 @@ const SITE = {
     footRight: 'hand-drafted on a blueprint',
   },
 };
+
 /* ==========================================================================
    ENGINE (you shouldn't need to touch anything below)
    ========================================================================== */
@@ -954,7 +968,7 @@ function renderSkills() {
     grid.append(box);
   });
 }
-  
+
 function renderContact() {
   const c = SITE.contact;
   $('#contact-title').innerHTML = c.title;
