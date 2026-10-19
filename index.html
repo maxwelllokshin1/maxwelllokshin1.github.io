@@ -544,13 +544,9 @@ const SITE = {
 
   life: [
     { caption: 'climbing',   media: { src: 'assets/life/climb.jpeg' } },
-    { caption: 'red (og)',   media: { src: 'assets/life/red.jpeg' } },
-    { caption: 'onyx (he bites)',   media: { src: 'assets/life/onyx.jpeg' } },
-    { caption: 'cupid (the bear)',   media: { src: 'assets/life/cupid.jpeg' } },
     { caption: 'totoro (goatoro)',   media: { src: 'assets/life/totoro.jpeg' } },
     { caption: 'at home garden',   media: { src: 'assets/life/garden.jpeg' } },
-    { caption: 'glass blowing',   media: { src: 'assets/life/glass_blowing.jpeg' } },
-    { caption: 'Alicia <3 (my gf)',   media: { src: 'assets/life/alicia.jpeg' } },
+
   ],
 
   career: {
@@ -596,17 +592,17 @@ const SITE = {
   },
 
   // Climbing scroll animation. 501 frames can be heavy on phones: consider fewer or smaller frames.
-  scrubs: [
-    { after: 'career',
-      frames: 'assets/frames/climb/{n}.jpg',
-      ar: '9/16',
-      count: 501, start: 1, pad: 4, height: '620vh',
-      captions: [
-        { at: 0.05, text: 'start low…' },
-        { at: 0.40, text: 'find the next hold' },
-        { at: 0.80, text: 'stick the top out' },
-      ] },
-  ],
+  // scrubs: [
+  //   { after: 'career',
+  //     frames: 'assets/frames/climb/{n}.jpg',
+  //     ar: '9/16',
+  //     count: 501, start: 1, pad: 4, height: '620vh',
+  //     captions: [
+  //       { at: 0.05, text: 'start low…' },
+  //       { at: 0.40, text: 'find the next hold' },
+  //       { at: 0.80, text: 'stick the top out' },
+  //     ] },
+  // ],
 
   skills: {
     title: 'The <span class="hand">tools</span>',
@@ -629,30 +625,39 @@ const SITE = {
       // TODO: set the real file names for the Tubi assets, add github/demo links, and a team size if you want one
       { id: 'tubi', category: 'animatronics', title: 'Tubi the Frog', year: '2026',
         tagline: 'An animatronic wizard you can talk to',
-        cover: { src: 'assets/projects/tubi-cover.jpg', ar: '4/3' },
+        cover: { src: 'assets/projects/tubi/tubi_main.png', ar: '4/3' },
         role: 'Embedded (ESP32 state machine, servos, audio)', duration: 'Hackathon',
         tags: ['ESP32', 'Raspberry Pi', 'WebSockets', 'Whisper', 'OpenAI', 'ElevenLabs', 'React', 'Node.js', 'Animation'],
         summary: 'Inspired by the animatronic characters at theme parks that talk, react, and make guests feel like they’ve stepped into a story. Tap your phone on the NFC chip to wake Tubi, hold the crystal ball on your screen to talk, and answer his ridiculous hypotheticals. After a back-and-forth he reads your destiny and tells you what kind of magic user you are.',
         blocks: [
-          { type: 'video', src: 'assets/projects/tubi-demo.mp4', caption: 'Talking with Tubi' },
+          { type: 'text', title: 'Who is Tubi', html: 'You have entered the magical enchanted forest, and suddenly you stumble across a frog. Not just any frog, he wears a silly hat and outfit. As you try to figure out who he is, he wakes up. "Hi I am Tubi the magical wizard frog". Our goal with this frog was to build a silly world where people can come up to him and interact and possibly learn more about themselves in the process. Originally he was going to dispense snacks, but that idea backfired at the last 5 hours of the competition (hardware issues).' },
+          { type: 'video', src: 'assets/projects/tubi/tubi9.mov', caption: 'Demo vid of Tubi' },
+          { type: 'pair', src: ['assets/projects/tubi/tubi1.jpg', 'assets/projects/tubi/tubi3.jpeg', 'assets/projects/tubi/tubi4.jpeg'], caption: 'From sketching in my math class to prototyping, heres our journey of going from ideating to creating' },
+
+
           { type: 'text', title: 'How it works', html: '<p>The workload is split across three devices so none gets overloaded. The <b>web app</b> records your voice and turns it into text with Whisper, then sends it over a WebSocket. A <b>Raspberry Pi</b> hosts the site, feeds the text to an LLM through the OpenAI API, and turns the reply into speech with ElevenLabs. An <b>ESP32</b> receives the response over serial and runs a custom state machine that plays the audio and moves the servos based on the words in each package.</p>' },
+          
           { type: 'text', title: 'The hard part', html: '<p>Speaker output kept coming out as static or silence. Audio bytes and servo commands were sharing one serial connection, which blocked the audio and put noise in the amplifier. Giving each its own UART line fixed it. Then a 3D print failed in the last hours of the hackathon and we had to rethink the build, so servos, cardboard, and paint carried the final version.</p>' },
-          { type: 'text', title: 'What I learned', html: '<p>The first idea is rarely the one that crosses the finish line. Improvising when a plan breaks is a skill, and this project forced me to practice it.</p>' },
+
+          { type: 'text', title: 'MORE OF TUBI', html: ''},
+          { type: 'pair', src: ['assets/projects/tubi/tubi5.jpg', 'assets/projects/tubi/tubi6.mov', 'assets/projects/tubi/tubi7.mov', 'assets/projects/tubi/tubi8.mov'], caption: '' },
         ],
-        github: '', demo: '' },
+        github: '', demo: 'https://devpost.com/software/tubi-the-frog' },
 
       // TODO: update this card as the car comes together (lap times, eye-tracking performance, final expression list)
       { id: 'mcqueen', category: 'animatronics', title: 'Lightning McQueen (in progress)', year: '2026',
         tagline: 'An autonomous race car with a face',
-        cover: { src: 'assets/projects/mcqueen-cover.jpg', ar: '4/3' },
-        role: 'Software (autonomy + OLED eyes)', duration: 'In progress',
-        tags: ['F1TENTH', 'ROS 2', 'ESP32', 'Computer vision', 'LiDAR', 'OLED eyes'],
-        summary: 'For our second F1TENTH competition, with nationals as the goal, the car is dressed as Lightning McQueen. I built two OLED eyes from scratch that blink and follow people using a human-detection model, wrote a custom wall-following algorithm, and added speed-up and slow-down commands that update dynamically for each track size. The car plays “Ka-chow” through onboard speakers.',
+        cover: { src: 'assets/projects/mcqueen/mk4.jpeg', ar: '4/3' },
+        role: 'Software (autonomy + animation)', duration: 'In progress',
+        tags: ['F1TENTH', 'ROS 2', 'ESP32', 'Computer vision', 'LiDAR', 'animation'],
+        summary: 'For our second F1TENTH competition, with nationals as the goal, the car is dressed as Lightning McQueen. We wanted to build a car that was not only fast and quick with maneuvering the course, but also I wanted to add some clever design around it. Lightning McQueen racing for the piston cup was the perfect scene since the racing was already handled. I built two OLED eyes from scratch that blink and follow people using a human-detection model, wrote a custom wall-following algorithm, and added speed-up and slow-down commands that update dynamically for each track size. The car plays “Ka-chow” through onboard speakers and changes expressions based on the the different modes it is in.',
         blocks: [
-          { type: 'video', src: 'assets/projects/mcqueen-eyes.mp4', caption: 'The eyes tracking a person' },
-          { type: 'text', title: 'What’s next', html: '<p>Expressions tied to what the car is doing: focused when armed, surprised near a wall, excited on a fast lap. A Nintendo Switch controller will act as a dead man’s switch so the car only runs while I’m holding the button.</p>' },
+          { type: 'video', src: 'assets/projects/mcqueen/mk5.mov', caption: 'The eyes tracking a person' },
+          { type: 'pair', src: ['assets/projects/mcqueen/mk6.mov', 'assets/projects/mcqueen/mk2.jpeg', 'assets/projects/mcqueen/mk3.jpeg'], caption: 'Assembly of the car' },
+
+          { type: 'image', src: 'assets/projects/mcqueen/mk1.jpeg', caption: 'Custom made dashboard to include tuning of parameters, live camera feed, and lidar view as well as extra stuff' },
         ],
-        github: '', demo: '' },
+        github: 'https://github.com/maxwelllokshin1/mk2', demo: '' },
 
       // TODO: add a photo and any details you can share (motion approach, results)
       { id: 'scorpion', category: 'animatronics', title: 'Animatronic Scorpion (in progress)', year: '2026',
